@@ -1,0 +1,10 @@
+[
+  {
+    "titulo": "🎉 Bem-vindo ao Gerenciador de Avisos!",
+    "descricao": "Este é um aviso de exemplo gerado automaticamente. Você pode deletá-lo e criar novos avisos.",
+    "data_inicio": "2024-01-01 09:00",
+    "data_fim": "2029-12-31 18:00",
+    "url_imagem": "http://localhost:3000/uploads/1749491346613-wall.png",
+    "link": ""
+  }
+]

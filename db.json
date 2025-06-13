@@ -1,0 +1,15 @@
+{
+  "screens": [
+    {
+      "id": "1000",
+      "name": "Tela 1",
+      "layout": "layout-a",
+      "config": {
+        "rssFeedUrl": "https://fct.ufg.br/feed",
+        "carouselInterval": 10000,
+        "newsQuantity": 2,
+        "includeAvisos": false
+      }
+    }
+  ]
+}

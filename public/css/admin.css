@@ -1,0 +1,198 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    color: #333;
+}
+
+/* --- Cabeçalho --- */
+.admin-header {
+    background-color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #0072b9;
+}
+
+.logout-button {
+    background-color: #d93025;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #b0261c;
+}
+
+/* --- Conteúdo Principal --- */
+.admin-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.toolbar h2 {
+    margin: 0;
+}
+
+.add-button {
+    background-color: #0072b9;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.add-button:hover {
+    background-color: #005a94;
+}
+
+/* --- Lista de Telas --- */
+.screen-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.screen-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.screen-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: #222;
+}
+
+.screen-info p {
+    margin: 0;
+    color: #666;
+}
+
+.screen-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.action-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: background-color 0.2s, border-color 0.2s;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.action-button:hover {
+    background-color: #e9ecef;
+    border-color: #bbb;
+}
+
+.action-button.view {
+    background-color: #e7f3fe;
+    border-color: #0072b9;
+    color: #005a94;
+}
+.action-button.view:hover {
+    background-color: #d0e7fd;
+}
+
+.action-button.delete {
+    color: #d93025;
+    border-color: #f5c6cb;
+}
+.action-button.delete:hover {
+    background-color: #f8d7da;
+}
+
+/* Estilos para formulário */
+.form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+}
+
+.form-actions {
+    text-align: right;
+    margin-top: 2rem;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.refresh-button {
+    background-color: #28a745; /* Verde */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+    background-color: #218838;
+}
