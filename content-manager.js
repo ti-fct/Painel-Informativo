@@ -130,7 +130,12 @@ async function fetchContent(screen) { // Recebe o objeto screen inteiro
     }
 
     // Adiciona a busca de notícias
-    promises.push(_carregarNoticiasFeed(screenConfig));
+    if (screenConfig.includeRss !== false) {
+        promises.push(_carregarNoticiasFeed(screenConfig));
+    } else {
+        promises.push(Promise.resolve([])); // Adiciona um array vazio se não for para incluir RSS
+        console.log('Feed RSS ignorado para esta tela, conforme configuração.');
+    }
     
     // Executa as buscas em paralelo
     const [avisos, noticias] = await Promise.all(promises);

@@ -68,14 +68,24 @@ async function readDB() {
 async function writeDB(data) {
     await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
 }
-async function generateUniqueScreenId() {
+// Função para numerar telas
+async function generateNextScreenId() {
     const db = await readDB();
-    const existingIds = new Set(db.screens.map(s => s.id));
-    let newId;
-    do {
-        newId = Math.floor(1000 + Math.random() * 9000).toString();
-    } while (existingIds.has(newId));
-    return newId;
+    
+    if (!db.screens || db.screens.length === 0) {
+        // Se não houver telas, começa com "001"
+        return "001";
+    }
+
+    // Encontra o maior ID numérico atual
+    const maxId = db.screens.reduce((max, screen) => {
+        const currentId = parseInt(screen.id, 10);
+        return currentId > max ? currentId : max;
+    }, 0);
+
+    // Incrementa o maior ID e formata para ter 3 dígitos
+    const nextId = maxId + 1;
+    return nextId.toString().padStart(3, '0');
 }
 
 // Para os avisos (avisos.json)
@@ -163,7 +173,7 @@ app.get('/api/content/:id', async (req, res) => {
 app.get('/', (req, res) => res.redirect('/admin/login'));
 app.get('/admin/login', (req, res) => res.render('login', { error: null }));
 app.post('/admin/login', (req, res) => {
-    if (req.body.username === 'admin' && req.body.password === 'admin123') {
+    if (req.body.username === 'admin' && req.body.password === 'admin') {
         req.session.isLoggedIn = true;
         res.redirect('/admin/dashboard');
     } else {
@@ -184,16 +194,20 @@ app.get('/admin/screen/new', requireAuth, (req, res) => {
 });
 app.post('/admin/screen/new', requireAuth, async (req, res) => {
     try {
-        const { name, layout, rssFeedUrl, carouselInterval, newsQuantity, includeAvisos } = req.body;
+        // Captura os novos campos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
+
         const newScreen = {
-            id: await generateUniqueScreenId(),
+            id: await generateNextScreenId(),
             name,
             layout,
             config: {
-                rssFeedUrl,
+                // Se o RSS não for incluído, salva uma string vazia ou o valor fornecido
+                rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
+                newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
                 carouselInterval: parseInt(carouselInterval, 10),
-                newsQuantity: parseInt(newsQuantity, 10),
-                includeAvisos: includeAvisos === 'true'
+                includeAvisos: includeAvisos === 'true',
+                includeRss: includeRss === 'true' // Salva o estado do toggle
             }
         };
         const db = await readDB();
@@ -213,8 +227,10 @@ app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
 });
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        const { name, layout, rssFeedUrl, carouselInterval, newsQuantity, includeAvisos } = req.body;
+        // Captura os novos campos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
         const db = await readDB();
+        
         const screenIndex = db.screens.findIndex(s => s.id === req.params.id);
         if (screenIndex === -1) return res.status(404).send('Tela não encontrada.');
 
@@ -223,10 +239,11 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
             name,
             layout,
             config: {
-                rssFeedUrl,
+                rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
+                newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
                 carouselInterval: parseInt(carouselInterval, 10),
-                newsQuantity: parseInt(newsQuantity, 10),
-                includeAvisos: includeAvisos === 'true'
+                includeAvisos: includeAvisos === 'true',
+                includeRss: includeRss === 'true'
             }
         };
         await writeDB(db);
@@ -292,7 +309,52 @@ app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (r
     broadcastRefresh();
     res.json({ success: true, message: 'Aviso atualizado com sucesso!' });
 });
-app.delete('/api/avisos/:index', requireAuth, async (req, res) => { /* ... (código existente sem alterações) ... */ });
+app.delete('/api/avisos/:index', requireAuth, async (req, res) => {
+    try {
+        const avisos = await readAvisos();
+        const index = parseInt(req.params.index, 10);
+
+        // Validação: garante que o índice é um número válido e está dentro dos limites do array
+        if (isNaN(index) || index < 0 || index >= avisos.length) {
+            return res.status(404).json({ success: false, message: 'Aviso não encontrado ou índice inválido.' });
+        }
+
+        // Remove o aviso do array usando splice.
+        // O splice retorna um array com os itens removidos, então pegamos o primeiro (e único) item.
+        const [deletedAviso] = avisos.splice(index, 1);
+
+        // Lógica para remover a imagem associada, se houver
+        if (deletedAviso && deletedAviso.url_imagem && deletedAviso.url_imagem.includes('/uploads/')) {
+            try {
+                // Extrai o nome do arquivo da URL completa
+                const imageFilename = path.basename(new URL(deletedAviso.url_imagem).pathname);
+                const imagePath = path.join(UPLOADS_DIR, imageFilename);
+
+                // Verifica se o arquivo existe antes de tentar apagar
+                if (fs.existsSync(imagePath)) {
+                    await fs.unlink(imagePath); // Usa a versão assíncrona
+                    console.log(`Imagem removida: ${imagePath}`);
+                }
+            } catch (e) {
+                // Loga o erro, mas não impede a resposta de sucesso, pois o aviso foi removido do JSON.
+                console.error("Não foi possível remover o arquivo de imagem associado:", e.message);
+            }
+        }
+
+        // Salva o array modificado de volta no arquivo JSON
+        await writeAvisos(avisos);
+
+        // Dispara o refresh para todas as telas ativas
+        broadcastRefresh();
+
+        // Responde com sucesso
+        res.json({ success: true, message: 'Aviso removido com sucesso!' });
+
+    } catch (error) {
+        console.error('Erro ao excluir aviso:', error);
+        res.status(500).json({ success: false, message: 'Erro interno no servidor ao tentar excluir o aviso.' });
+    }
+});
 
 // =======================================================
 // 9. INICIALIZAÇÃO DO SERVIDOR

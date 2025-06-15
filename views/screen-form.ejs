@@ -7,34 +7,52 @@
                value="<%= screen ? screen.name : '' %>">
     </div>
 
-    <div class="form-group form-group-inline">
-        <label for="includeAvisos">Incluir Avisos Globais nesta Tela?</label>
-        <label class="toggle-switch">
-            <input type="checkbox" id="includeAvisos" name="includeAvisos" value="true"
-                   <% if (!screen || screen.config.includeAvisos !== false) { %>checked<% } %>>
-            <span class="slider"></span>
-        </label>
-    </div>
-
+    <!-- Seção de Configuração de Conteúdo -->
     <fieldset>
-        <legend>Configurações de Conteúdo</legend>
+        <legend>Fontes de Conteúdo</legend>
+
+        <!-- Toggle para Avisos -->
+        <div class="form-group form-group-inline">
+            <label for="includeAvisos">Exibir Avisos Globais</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="includeAvisos" name="includeAvisos" value="true"
+                       <% if (!screen || screen.config.includeAvisos !== false) { %>checked<% } %>>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- NOVO: Toggle para Feed RSS -->
+        <div class="form-group form-group-inline">
+            <label for="includeRss">Exibir Notícias de Feed RSS</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="includeRss" name="includeRss" value="true"
+                       <% if (!screen || screen.config.includeRss !== false) { %>checked<% } %>>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- NOVO: Container para os campos de RSS -->
+        <div id="rss-fields-container">
+            <div class="form-group">
+                <label for="rssFeedUrl">URL do Feed RSS</label>
+                <input type="url" id="rssFeedUrl" name="rssFeedUrl" placeholder="https://exemplo.com/feed"
+                       value="<%= screen ? screen.config.rssFeedUrl : '' %>">
+            </div>
+            <div class="form-group">
+                <label for="newsQuantity">Quantidade de Notícias</label>
+                <input type="number" id="newsQuantity" name="newsQuantity" min="1" max="20"
+                       value="<%= screen ? screen.config.newsQuantity : '5' %>">
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <fieldset>
+        <legend>Configurações de Exibição</legend>
         <div class="form-group">
             <label for="layout">Layout</label>
             <select id="layout" name="layout">
-                <option value="layout-a" <%= (screen && screen.layout === 'layout-a') ? 'selected' : '' %>>
-                    Layout A (Imagem + Texto)
-                </option>
+                <option value="layout-a">Layout A (Imagem + Texto)</option>
             </select>
-        </div>
-        <div class="form-group">
-            <label for="rssFeedUrl">URL do Feed RSS</label>
-            <input type="url" id="rssFeedUrl" name="rssFeedUrl" required placeholder="https://exemplo.com/feed"
-                   value="<%= screen ? screen.config.rssFeedUrl : '' %>">
-        </div>
-        <div class="form-group">
-            <label for="newsQuantity">Quantidade de Notícias</label>
-            <input type="number" id="newsQuantity" name="newsQuantity" min="1" max="20" required
-                   value="<%= screen ? screen.config.newsQuantity : '5' %>">
         </div>
         <div class="form-group">
             <label for="carouselInterval">Intervalo do Carrossel (ms)</label>
@@ -50,7 +68,34 @@
     </div>
 </form>
 
-</main> <!-- Fecha o .admin-container do header -->
+<!-- NOVO: Script para controlar a visibilidade dos campos RSS -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const includeRssToggle = document.getElementById('includeRss');
+        const rssFieldsContainer = document.getElementById('rss-fields-container');
+        const rssUrlInput = document.getElementById('rssFeedUrl');
+        const newsQuantityInput = document.getElementById('newsQuantity');
+
+        function toggleRssFields() {
+            if (includeRssToggle.checked) {
+                rssFieldsContainer.style.display = 'block';
+                rssUrlInput.required = true;
+                newsQuantityInput.required = true;
+            } else {
+                rssFieldsContainer.style.display = 'none';
+                rssUrlInput.required = false;
+                newsQuantityInput.required = false;
+            }
+        }
+
+        // Executa na primeira vez que a página carrega
+        toggleRssFields();
+
+        // Adiciona o listener para mudanças no toggle
+        includeRssToggle.addEventListener('change', toggleRssFields);
+    });
+</script>
+
 <%- include('_admin-footer') %>
 </body>
 </html>

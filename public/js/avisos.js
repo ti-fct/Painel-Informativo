@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seletores dos elementos principais
     const avisosContainer = document.getElementById('avisos-grid');
     const modal = document.getElementById('aviso-modal');
     const modalTitle = document.getElementById('modal-title');
@@ -65,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="aviso-card-actions">
                     <button class="btn btn-secondary edit-btn" data-index="${index}">Editar</button>
-                    <button class="btn btn-danger delete-btn" data-index="${index}">Excluir</button>
+                   <button class="btn btn-danger delete-btn" data-index="${index}">Excluir</button>
                 </div>
             `;
             avisosContainer.appendChild(card);

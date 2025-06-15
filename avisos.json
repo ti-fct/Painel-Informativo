@@ -1,19 +1,10 @@
 [
   {
     "titulo": "teste",
-    "descricao": "teste",
-    "data_inicio": "2025-06-14 08:00",
-    "data_fim": "2025-06-15 08:00",
+    "descricao": "teste teste",
+    "data_inicio": "2025-06-09 08:00",
+    "data_fim": "2025-06-27 08:00",
     "link": "",
-    "url_imagem": "http://localhost:3000/uploads/1749946913965-wall.png",
-    "aviso_index": "0"
-  },
-  {
-    "titulo": "teesfdsdffdsafds dsffdsfsdasdf dfs",
-    "descricao": "fdsdsfdsfadsfa fsdfd fdsfdsadfsafdsfsdfdsdsffdsfdsdf s fddsf dfs fdsfsdfdssfdasafdsfdafsdafdsfsdfdsfsd",
-    "data_inicio": "2025-06-13 08:05",
-    "data_fim": "2025-07-06 08:00",
-    "link": "",
-    "url_imagem": "http://localhost:3000/uploads/1749949791679-depositphotos_50929921-stock-illustration-jaguar.jpg"
+    "url_imagem": "http://localhost:3000/uploads/1749981559645-17444681-jaguar-face.jpg"
   }
 ]

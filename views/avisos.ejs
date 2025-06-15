@@ -1,23 +1,19 @@
 <%- include('_admin-header', { pageTitle: 'Gerenciar Avisos' }) %>
 
-<!-- Link para a folha de estilo específica desta página -->
 <link rel="stylesheet" href="/css/avisos.css">
 
-<!-- Toolbar da página -->
 <div class="toolbar">
     <h2>Gerenciar Avisos</h2>
     <button class="btn btn-primary" id="add-aviso-btn">Adicionar Novo Aviso</button>
 </div>
 
-<!-- Grid onde os cards de aviso serão renderizados -->
 <div id="avisos-grid">
-    <!-- Conteúdo gerado pelo avisos.js -->
+    <!-- Conteúdo gerado pelo JavaScript -->
 </div>
 
-<!-- O footer fecha as tags <main> e <body> do _admin-header -->
 <%- include('_admin-footer') %>
 
-<!-- O Modal fica fora do <main> para sobrepor tudo -->
+<!-- MODAL: A estrutura interna foi simplificada para herdar os estilos de forma mais direta -->
 <div id="aviso-modal" class="modal">
     <div class="form-card" style="width: 100%; max-width: 600px; position: relative;">
         <span id="close-modal-btn" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; cursor: pointer; line-height: 1;">×</span>
@@ -26,13 +22,15 @@
         <form id="aviso-form">
             <input type="hidden" id="aviso_index" name="aviso_index">
             
+            <!-- Os inputs estão diretamente dentro do form, e os labels associados por 'for' -->
+            <!-- O .form-group será usado no CSS para espaçamento -->
             <div class="form-group">
                 <label for="titulo">Título</label>
                 <input type="text" id="titulo" name="titulo" required>
             </div>
             <div class="form-group">
                 <label for="descricao">Descrição</label>
-                <textarea id="descricao" name="descricao" required style="min-height: 100px;"></textarea>
+                <textarea id="descricao" name="descricao" required></textarea>
             </div>
             <div class="form-group">
                 <label for="data_inicio">Data de Início</label>
@@ -61,7 +59,6 @@
 
 <div id="toast"></div>
 
-<!-- Link para o JavaScript específico desta página -->
 <script src="/js/avisos.js"></script>
 
 </body>
