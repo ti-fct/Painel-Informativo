@@ -71,7 +71,7 @@ async function writeDB(data) {
 // Função para numerar telas
 async function generateNextScreenId() {
     const db = await readDB();
-    
+
     if (!db.screens || db.screens.length === 0) {
         // Se não houver telas, começa com "001"
         return "001";
@@ -188,7 +188,7 @@ app.get('/admin/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/admin/login'));
 });
 
-// --- CRUD DE TELAS (CORRIGIDO E SEM DUPLICAÇÃO) ---
+// --- CRUD DE TELAS ---
 app.get('/admin/screen/new', requireAuth, (req, res) => {
     res.render('screen-form', { pageTitle: 'Adicionar Nova Tela', formAction: '/admin/screen/new', screen: null });
 });
@@ -227,25 +227,35 @@ app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
 });
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        // Captura os novos campos
         const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
         const db = await readDB();
-        
+
         const screenIndex = db.screens.findIndex(s => s.id === req.params.id);
         if (screenIndex === -1) return res.status(404).send('Tela não encontrada.');
 
+        // Pega a configuração existente para usar como base
+        const existingConfig = db.screens[screenIndex].config;
+
+        // Atualiza os dados da tela
         db.screens[screenIndex] = {
             id: req.params.id,
             name,
             layout,
             config: {
-                rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
-                newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
+                rssFeedUrl: (includeRss === 'true')
+                    ? rssFeedUrl // Se RSS estiver LIGADO, usa o novo valor do formulário
+                    : existingConfig.rssFeedUrl, // Se estiver DESLIGADO, mantém o valor antigo
+
+                newsQuantity: (includeRss === 'true')
+                    ? parseInt(newsQuantity, 10) // Se RSS estiver LIGADO, usa o novo valor
+                    : existingConfig.newsQuantity, // Se estiver DESLIGADO, mantém o valor antigo
+
                 carouselInterval: parseInt(carouselInterval, 10),
                 includeAvisos: includeAvisos === 'true',
                 includeRss: includeRss === 'true'
             }
         };
+
         await writeDB(db);
         res.redirect('/admin/dashboard');
     } catch (error) {
@@ -270,7 +280,7 @@ app.get('/admin/avisos', requireAuth, (req, res) => {
 });
 
 // =======================================================
-// 8. API DE AVISOS (com correção para não salvar aviso_index)
+// 8. API DE AVISOS 
 // =======================================================
 app.get('/api/avisos', async (req, res) => {
     const avisos = await readAvisos();

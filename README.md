@@ -114,11 +114,15 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 
 ## Próximos Passos e Melhorias Futuras
 
-- [ ] Implementar um sistema de autenticação mais robusto com banco de dados (ex: PostgreSQL ou MongoDB).
+- [ ] Configurar Docker para ambiente de produção.
+- [ ] Implementar um sistema de autenticação mais robusto e criptografia.
 - [ ] Adicionar mais layouts de tela (ex: Layout B apenas com imagens, Layout C com vídeo e texto).
 - [ ] Permitir a configuração de múltiplas fontes de conteúdo (mais de um feed RSS) por tela.
 - [ ] Criar uma interface para visualizar logs de erros do servidor.
-- [ ] Refatorar a persistência de dados para usar um banco de dados real em vez de arquivos JSON.
+- [ ] Implementar quantas telas estão conectadas no dashboad.
+- [ ] Melhorias no códgio e UX.
+
+
 
 ---
 

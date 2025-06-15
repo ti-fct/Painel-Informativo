@@ -1,5 +1,6 @@
 /* --- Reset e Estilos Globais --- */
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
@@ -14,8 +15,9 @@ body, html {
     color: white;
     padding: 10px 20px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .main-header h1 {
     margin: 0;
     font-size: 28px;
@@ -25,7 +27,8 @@ body, html {
 /* --- Contêiner Principal --- */
 .content-container {
     display: flex;
-    height: calc(100vh - 60px); /* Altura total menos o cabeçalho */
+    height: calc(100vh - 60px);
+    /* Altura total menos o cabeçalho */
     padding: 20px;
     box-sizing: border-box;
 }
@@ -37,7 +40,7 @@ body, html {
     flex-direction: column;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -46,14 +49,16 @@ body, html {
     display: flex;
     padding: 20px;
     gap: 20px;
-    overflow: hidden; /* Evita que conteúdo vaze */
+    overflow: hidden;
+    /* Evita que conteúdo vaze */
 }
 
-/* --- Layout Responsivo (Breakpoint idêntico ao Python) --- */
+/* --- Layout Responsivo (Breakpoint) --- */
 
 /* TELA GRANDE (>= 900px): Horizontal */
 .image-container {
-    flex: 2; /* 40% */
+    flex: 2;
+    /* 40% */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -62,8 +67,10 @@ body, html {
     border-radius: 10px;
     position: relative;
 }
+
 .text-container {
-    flex: 3; /* 60% */
+    flex: 3;
+    /* 60% */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -74,8 +81,10 @@ body, html {
     .carousel-item-content {
         flex-direction: column;
     }
+
     .image-container {
-        min-height: 200px; /* Garante altura mínima na vertical */
+        min-height: 200px;
+        /* Garante altura mínima na vertical */
         max-height: 40%;
     }
 }
@@ -84,8 +93,10 @@ body, html {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    display: none; /* Escondido até carregar */
+    display: none;
+    /* Escondido até carregar */
 }
+
 .image-container .image-placeholder {
     color: #888;
 }
@@ -97,22 +108,30 @@ body, html {
     color: #0072b9;
     margin: 0 0 10px 0;
 }
+
 #carousel-date {
     font-size: 1.2vw;
     color: #555;
     font-style: italic;
     margin-bottom: 15px;
 }
+
 .description-scroll-area {
     flex-grow: 1;
-    overflow-y: scroll; /* A rolagem será controlada por JS */
-    -ms-overflow-style: none; /* IE e Edge */
-    scrollbar-width: none; /* Firefox */
+    overflow-y: scroll;
+    /* A rolagem será controlada por JS */
+    -ms-overflow-style: none;
+    /* IE e Edge */
+    scrollbar-width: none;
+    /* Firefox */
     padding-right: 15px;
 }
+
 .description-scroll-area::-webkit-scrollbar {
-    display: none; /* Chrome, Safari e Opera */
+    display: none;
+    /* Chrome, Safari e Opera */
 }
+
 #carousel-description {
     font-size: 1.8vw;
     color: #333;
@@ -125,6 +144,7 @@ body, html {
     justify-content: flex-end;
     padding-top: 10px;
 }
+
 #qr-code {
     width: 150px;
     height: 150px;
@@ -136,6 +156,7 @@ body, html {
     width: 100%;
     background-color: transparent;
 }
+
 .progress-bar-fill {
     height: 100%;
     width: 0%;
@@ -145,7 +166,15 @@ body, html {
 
 /* Ajustes de fonte responsivos para telas pequenas */
 @media (max-width: 899px) {
-    #carousel-title { font-size: 24px; }
-    #carousel-date { font-size: 16px; }
-    #carousel-description { font-size: 18px; }
+    #carousel-title {
+        font-size: 24px;
+    }
+
+    #carousel-date {
+        font-size: 16px;
+    }
+
+    #carousel-description {
+        font-size: 18px;
+    }
 }

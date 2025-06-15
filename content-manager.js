@@ -9,7 +9,6 @@ const AVISOS_DB_PATH = path.join(__dirname, 'avisos.json');
 const parser = new RssParser();
 const LIMITE_DESCRICAO_CARACTERES = 1200;
 
-// A função _carregarAvisosAtivos permanece a mesma.
 async function _carregarAvisosAtivos() {
     try {
         const data = await fs.readFile(AVISOS_DB_PATH, 'utf-8');
@@ -65,7 +64,7 @@ async function _carregarNoticiasFeed(screenConfig) {
             const $ = cheerio.load(content);
 
             // =======================================================
-            // LÓGICA DE CORREÇÃO DA IMAGEM
+            // LÓGICA DE CORREÇÃO DA IMAGEM (APENAS SITES UFG.BR)
             // =======================================================
             let url_imagem = $('img').first().attr('src');
             if (url_imagem) {
@@ -73,7 +72,7 @@ async function _carregarNoticiasFeed(screenConfig) {
                 // Verifica se a URL contém a duplicação "fct.ufg.brhttp"
                 if (urlLower.includes("fct.ufg.brhttp") || urlLower.includes("ufg.brhttp")) {
                     // Encontra o início da segunda URL 'http' (ignorando a primeira)
-                    const startIndex = urlLower.indexOf("http", 1); 
+                    const startIndex = urlLower.indexOf("http", 1);
                     if (startIndex !== -1) {
                         // Extrai a parte correta da string original, preservando o case
                         url_imagem = url_imagem.substring(startIndex);
@@ -98,7 +97,7 @@ async function _carregarNoticiasFeed(screenConfig) {
                     data_formatada = format(new Date(item.isoDate), 'dd/MM/yyyy - HH:mm');
                 } catch (e) { console.warn(`Data inválida para o item: ${item.title}`); }
             }
-            
+
             entradasProcessadas.push({
                 titulo: item.title,
                 descricao: descricao,
@@ -136,12 +135,12 @@ async function fetchContent(screen) { // Recebe o objeto screen inteiro
         promises.push(Promise.resolve([])); // Adiciona um array vazio se não for para incluir RSS
         console.log('Feed RSS ignorado para esta tela, conforme configuração.');
     }
-    
+
     // Executa as buscas em paralelo
     const [avisos, noticias] = await Promise.all(promises);
-    
+
     const content = [...avisos, ...noticias]; // Junta os resultados
-    
+
     if (!content.length) {
         console.warn("Nenhum conteúdo disponível.");
     } else {

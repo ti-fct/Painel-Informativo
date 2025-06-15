@@ -2,11 +2,11 @@
   "screens": [
     {
       "id": "001",
-      "name": "Tela Geral",
+      "name": "teste",
       "layout": "layout-a",
       "config": {
         "rssFeedUrl": "https://fct.ufg.br/feed",
-        "newsQuantity": 2,
+        "newsQuantity": 3,
         "carouselInterval": 10000,
         "includeAvisos": true,
         "includeRss": true

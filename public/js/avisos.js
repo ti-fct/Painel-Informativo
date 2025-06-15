@@ -87,10 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData = new FormData(form);
         const index = formData.get('aviso_index');
-        
+
         const url = index ? `/api/avisos/${index}` : '/api/avisos';
         const method = index ? 'PUT' : 'POST';
-        
+
         formData.set('data_inicio', formData.get('data_inicio').replace('T', ' '));
         formData.set('data_fim', formData.get('data_fim').replace('T', ' '));
 

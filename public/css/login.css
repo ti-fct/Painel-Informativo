@@ -7,28 +7,33 @@ body {
     height: 100vh;
     margin: 0;
 }
+
 .login-container {
     background: white;
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     text-align: center;
 }
+
 h2 {
     margin-bottom: 1.5rem;
     color: #333;
 }
+
 .input-group {
     margin-bottom: 1rem;
     text-align: left;
 }
+
 .input-group label {
     display: block;
     margin-bottom: 0.5rem;
     color: #555;
 }
+
 .input-group input {
     width: 100%;
     padding: 0.75rem;
@@ -36,6 +41,7 @@ h2 {
     border-radius: 4px;
     box-sizing: border-box;
 }
+
 button {
     width: 100%;
     padding: 0.75rem;
@@ -47,9 +53,11 @@ button {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 button:hover {
     background-color: #005a94;
 }
+
 .error-message {
     color: #d93025;
     margin-bottom: 1rem;

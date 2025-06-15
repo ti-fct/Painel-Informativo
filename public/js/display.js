@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================================
     // A variável 'initialData' é criada pelo EJS e está disponível globalmente.
     // Agora, usamos essa única fonte de verdade para configurar o script.
-    
+
     // Variáveis que podem mudar durante a execução
     let content = initialData.content;
     let config = initialData.config;
@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrCodeEl = document.getElementById('qr-code');
     const progressBarEl = document.getElementById('progress-bar');
     const descriptionArea = document.querySelector('.description-scroll-area');
-    //const headerTitleEl = document.querySelector('.main-header h1');
     // Atualiza o título principal da página
+    //const headerTitleEl = document.querySelector('.main-header h1');
     //headerTitleEl.textContent = initialData.screenName;
 
     // =======================================================
@@ -159,15 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplay();
         }
     }
-    
+
     async function fetchAndUpdateContent() {
         console.log(`Buscando atualizações para a tela ${screenId}...`);
         try {
             const response = await fetch(`/api/content/${screenId}`);
             if (!response.ok) throw new Error('Falha na resposta da API');
-            
+
             const newData = await response.json();
-            
+
             const isContentDifferent = JSON.stringify(content) !== JSON.stringify(newData.content);
             const isConfigDifferent = config.carouselInterval !== newData.config.carouselInterval;
 
