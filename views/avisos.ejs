@@ -1,0 +1,68 @@
+<%- include('_admin-header', { pageTitle: 'Gerenciar Avisos' }) %>
+
+<!-- Link para a folha de estilo específica desta página -->
+<link rel="stylesheet" href="/css/avisos.css">
+
+<!-- Toolbar da página -->
+<div class="toolbar">
+    <h2>Gerenciar Avisos</h2>
+    <button class="btn btn-primary" id="add-aviso-btn">Adicionar Novo Aviso</button>
+</div>
+
+<!-- Grid onde os cards de aviso serão renderizados -->
+<div id="avisos-grid">
+    <!-- Conteúdo gerado pelo avisos.js -->
+</div>
+
+<!-- O footer fecha as tags <main> e <body> do _admin-header -->
+<%- include('_admin-footer') %>
+
+<!-- O Modal fica fora do <main> para sobrepor tudo -->
+<div id="aviso-modal" class="modal">
+    <div class="form-card" style="width: 100%; max-width: 600px; position: relative;">
+        <span id="close-modal-btn" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; cursor: pointer; line-height: 1;">×</span>
+        <h2 id="modal-title" style="margin-top: 0; margin-bottom: 2rem;">Adicionar Novo Aviso</h2>
+        
+        <form id="aviso-form">
+            <input type="hidden" id="aviso_index" name="aviso_index">
+            
+            <div class="form-group">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" required style="min-height: 100px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="data_inicio">Data de Início</label>
+                <input type="datetime-local" id="data_inicio" name="data_inicio" required>
+            </div>
+            <div class="form-group">
+                <label for="data_fim">Data de Fim</label>
+                <input type="datetime-local" id="data_fim" name="data_fim" required>
+            </div>
+            <div class="form-group">
+                <label for="url_imagem">Imagem do Aviso (Opcional)</label>
+                <input type="file" id="url_imagem" name="url_imagem" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="link">Link Externo (Opcional)</label>
+                <input type="url" id="link" name="link" placeholder="https://exemplo.com">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-modal-btn">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Aviso</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Link para o JavaScript específico desta página -->
+<script src="/js/avisos.js"></script>
+
+</body>
+</html>

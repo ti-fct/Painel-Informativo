@@ -39,8 +39,7 @@
 
     <!-- Passando dados do servidor para o JavaScript do cliente -->
     <script>
-        const initialContent = <%- initialContent %>;
-        const config = <%- JSON.stringify(config) %>;
+        const initialData = <%- JSON.stringify({ screenId, screenName, content, config }) %>;
     </script>
     
     <!-- Bibliotecas e nosso script principal -->

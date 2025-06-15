@@ -1,57 +1,40 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo</title>
-    <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body>
-    <header class="admin-header">
-        <h1>Painel de Controle</h1>
-        <a href="/admin/logout" class="logout-button">Sair</a>
-    </header>
+<%- include('_admin-header', { pageTitle: 'Dashboard' }) %>
 
- <main class="admin-container">
-        <section class="toolbar">
-            <h2>Gerenciamento</h2>
-            <div class="toolbar-actions">
-                <!-- ATUALIZADO: Link para gerenciar avisos -->
-                <a href="/admin/avisos" class="action-button" style="background-color: #ffc107; border-color: #ffc107; color: #333; text-decoration: none;">Gerenciar Avisos</a>
-                
-                <form action="/admin/refresh-all" method="POST" style="display: inline;">
-                    <button type="submit" class="refresh-button">Forçar Atualização (F5)</button>
-                </form>
-                
-                <a href="/admin/screen/new" class="add-button" style="text-decoration: none;">Adicionar Nova Tela</a>
+<section class="toolbar">
+    <h2>Telas de Exibição</h2>
+    <!-- ATUALIZADO: Div para agrupar todas as ações da barra de ferramentas -->
+    <div class="toolbar-actions">
+        <!-- BOTÃO RESTAURADO -->
+        <form action="/admin/refresh-all" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-secondary">Forçar Atualização (F5)</button>
+        </form>
+        <a href="/admin/screen/new" class="btn btn-primary">Adicionar Nova Tela</a>
+    </div>
+</section>
+
+<section class="screen-list">
+    <% if (screens.length === 0) { %>
+        <p>Nenhuma tela cadastrada ainda.</p>
+    <% } else { %>
+        <% screens.forEach(screen => { %>
+            <div class="screen-card">
+                <div class="screen-info">
+                    <h3><%= screen.name %> <small style="font-weight: 400; color: #6c757d;">(ID: <%= screen.id %>)</small></h3>
+                    <p>RSS: <%= screen.config.rssFeedUrl %></p>
+                </div>
+                <div class="screen-actions">
+                    <a href="/display/<%= screen.id %>" target="_blank" class="btn btn-secondary">Visualizar</a>
+                    <a href="/admin/screen/edit/<%= screen.id %>" class="btn btn-secondary">Editar</a>
+                    <form action="/admin/screen/delete/<%= screen.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta tela?');">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </form>
+                </div>
             </div>
-        </section>
-        
-        <section class="screen-list">
-            <% if (screens.length === 0) { %>
-                <p>Nenhuma tela cadastrada ainda.</p>
-            <% } else { %>
-                <% screens.forEach(screen => { %>
-                    <div class="screen-card">
-                        <div class="screen-info">
-                            <h3><%= screen.name %></h3>
-                            <!-- Descrição mais útil com base nos dados reais -->
-                            <p>Layout: <%= screen.layout %> | RSS: <%= screen.config.rssFeedUrl %></p>
-                        </div>
-                        <div class="screen-actions">
-                            <a href="/display/<%= screen.id %>" target="_blank" class="action-button view">Visualizar</a>
-                            <!-- ATUALIZADO: Link de edição aponta para a rota correta -->
-                            <a href="/admin/screen/edit/<%= screen.id %>" class="action-button edit">Editar</a>
-                            
-                            <!-- ATUALIZADO: Botão de exclusão agora está em um formulário -->
-                            <form action="/admin/screen/delete/<%= screen.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta tela?');">
-                                <button type="submit" class="action-button delete">Excluir</button>
-                            </form>
-                        </div>
-                    </div>
-                <% }); %>
-            <% } %>
-        </section>
-    </main>
+        <% }); %>
+    <% } %>
+</section>
+
+</main> <!-- Fecha o .admin-container do header -->
+<%- include('_admin-footer') %>
 </body>
 </html>

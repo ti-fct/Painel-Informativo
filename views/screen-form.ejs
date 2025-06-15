@@ -1,116 +1,56 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body>
-    <header class="admin-header">
-        <h1><%= pageTitle %></h1>
-        <a href="/admin/dashboard" class="logout-button" style="background-color: #6c757d;">Voltar</a>
-    </header>
+<%- include('_admin-header', { pageTitle: pageTitle }) %>
 
-    <main class="admin-container">
-        <!-- O 'action' do formulário agora é dinâmico -->
-        <form action="<%= formAction %>" method="POST" class="form-card">
-            <div class="form-group">
-                <label for="name">Nome da Tela</label>
-                <!-- O valor é preenchido se 'screen' existir -->
-                <input type="text" id="name" name="name" required placeholder="Ex: Tela da Biblioteca" 
-                       value="<%= screen ? screen.name : '' %>">
-            </div>
+<form action="<%= formAction %>" method="POST" class="form-card">
+    <div class="form-group">
+        <label for="name">Nome da Tela</label>
+        <input type="text" id="name" name="name" required placeholder="Ex: Tela da Biblioteca" 
+               value="<%= screen ? screen.name : '' %>">
+    </div>
 
-            <div class="form-group form-group-inline">
-                <label for="includeAvisos">Incluir Avisos nesta Tela?</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="includeAvisos" name="includeAvisos" value="true"
-                           <% if (!screen || screen.config.includeAvisos) { %>checked<% } %>>
-                    <span class="slider"></span>
-                </label>
-            </div>
+    <div class="form-group form-group-inline">
+        <label for="includeAvisos">Incluir Avisos Globais nesta Tela?</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="includeAvisos" name="includeAvisos" value="true"
+                   <% if (!screen || screen.config.includeAvisos !== false) { %>checked<% } %>>
+            <span class="slider"></span>
+        </label>
+    </div>
 
-            <div class="form-group">
-                <label for="layout">Layout</label>
-                <select id="layout" name="layout">
-                    <!-- Marca a opção como 'selected' se o layout corresponder -->
-                    <option value="layout-a" <%= (screen && screen.layout === 'layout-a') ? 'selected' : '' %>>
-                        Layout A (Imagem + Texto)
-                    </option>
-                </select>
-            </div>
+    <fieldset>
+        <legend>Configurações de Conteúdo</legend>
+        <div class="form-group">
+            <label for="layout">Layout</label>
+            <select id="layout" name="layout">
+                <option value="layout-a" <%= (screen && screen.layout === 'layout-a') ? 'selected' : '' %>>
+                    Layout A (Imagem + Texto)
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rssFeedUrl">URL do Feed RSS</label>
+            <input type="url" id="rssFeedUrl" name="rssFeedUrl" required placeholder="https://exemplo.com/feed"
+                   value="<%= screen ? screen.config.rssFeedUrl : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="newsQuantity">Quantidade de Notícias</label>
+            <input type="number" id="newsQuantity" name="newsQuantity" min="1" max="20" required
+                   value="<%= screen ? screen.config.newsQuantity : '5' %>">
+        </div>
+        <div class="form-group">
+            <label for="carouselInterval">Intervalo do Carrossel (ms)</label>
+            <input type="number" id="carouselInterval" name="carouselInterval" min="5000" step="1000" required
+                   value="<%= screen ? screen.config.carouselInterval : '20000' %>">
+        </div>
+    </fieldset>
 
-            <fieldset>
-                <legend>Configurações do Layout</legend>
-                <div class="form-group">
-                    <label for="rssFeedUrl">URL do Feed RSS</label>
-                    <input type="url" id="rssFeedUrl" name="rssFeedUrl" required placeholder="https://exemplo.com/feed"
-                           value="<%= screen ? screen.config.rssFeedUrl : '' %>">
-                </div>
-                <div class="form-group">
-                    <label for="newsQuantity">Quantidade de Notícias</label>
-                    <input type="number" id="newsQuantity" name="newsQuantity" min="1" max="20" required
-                           value="<%= screen ? screen.config.newsQuantity : '5' %>">
-                </div>
-                <div class="form-group">
-                    <label for="carouselInterval">Intervalo do Carrossel (em milissegundos)</label>
-                    <input type="number" id="carouselInterval" name="carouselInterval" min="5000" step="1000" required
-                           value="<%= screen ? screen.config.carouselInterval : '20000' %>">
-                    <small>Ex: 20000 = 20 segundos</small>
-                </div>
-            </fieldset>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+            <%= screen ? 'Atualizar Tela' : 'Salvar Tela' %>
+        </button>
+    </div>
+</form>
 
-            <div class="form-actions">
-                <button type="submit" class="add-button">
-                    <%= screen ? 'Atualizar Tela' : 'Salvar Tela' %>
-                </button>
-            </div>
-        </form>
-    </main>
-
-    <!-- Adicionar alguns estilos para o formulário no admin.css -->
-    <style>
-        .form-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .form-group small {
-            display: block;
-            margin-top: 0.25rem;
-            color: #666;
-        }
-        fieldset {
-            border: 1px solid #ddd;
-            padding: 1.5rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
-        }
-        legend {
-            font-weight: bold;
-            color: #0072b9;
-            padding: 0 0.5rem;
-        }
-        .form-actions {
-            text-align: right;
-        }
-    </style>
+</main> <!-- Fecha o .admin-container do header -->
+<%- include('_admin-footer') %>
 </body>
 </html>

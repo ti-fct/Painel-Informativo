@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Painel Administrativo</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="header-content">
+            <a href="/admin/dashboard" class="logo-container">
+                <img src="/logo.png" alt="Logo da Universidade" class="logo">
+                <h1>Painel de Controle</h1>
+            </a>
+            <nav class="main-nav">
+                <a href="/admin/dashboard" class="nav-link">Telas</a>
+                <a href="/admin/avisos" class="nav-link">Avisos</a>
+                <a href="/admin/logout" class="nav-link logout-button">Sair</a>
+            </nav>
+        </div>
+    </header>
+    <main class="admin-container">

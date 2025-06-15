@@ -71,7 +71,7 @@ async function _carregarNoticiasFeed(screenConfig) {
             if (url_imagem) {
                 const urlLower = url_imagem.toLowerCase();
                 // Verifica se a URL contém a duplicação "fct.ufg.brhttp"
-                if (urlLower.includes("fct.ufg.brhttp")) {
+                if (urlLower.includes("fct.ufg.brhttp") || urlLower.includes("ufg.brhttp")) {
                     // Encontra o início da segunda URL 'http' (ignorando a primeira)
                     const startIndex = urlLower.indexOf("http", 1); 
                     if (startIndex !== -1) {
@@ -115,37 +115,44 @@ async function _carregarNoticiasFeed(screenConfig) {
     }
 }
 
-// A função fetchContent permanece a mesma.
-async function fetchContent(screenConfig = {}) {
-    console.log(`Iniciando atualização de conteúdo para: ${screenConfig.name || 'Tela sem nome'}`);
+async function fetchContent(screen) { // Recebe o objeto screen inteiro
+    const screenConfig = screen.config || {};
+    console.log(`Iniciando atualização de conteúdo para: ${screen.name || 'Tela sem nome'}`);
 
-    // Cria um array de "promessas" para buscar o conteúdo
     const promises = [];
 
-    // ATUALIZADO: Adiciona a busca de avisos à lista de promessas SOMENTE se a config permitir
-    // Por padrão, se a propriedade não existir, considera true para retrocompatibilidade.
+    // Adiciona a busca de avisos apenas se a config permitir.
     if (screenConfig.includeAvisos !== false) {
         promises.push(_carregarAvisosAtivos());
     } else {
-        // Se não for para incluir, adiciona uma promessa que resolve para um array vazio
-        promises.push(Promise.resolve([]));
+        promises.push(Promise.resolve([])); // Retorna um array vazio se não for para incluir
         console.log('Avisos globais ignorados para esta tela, conforme configuração.');
     }
 
     // Adiciona a busca de notícias
     promises.push(_carregarNoticiasFeed(screenConfig));
     
-    // Busca todas as fontes de conteúdo em paralelo
+    // Executa as buscas em paralelo
     const [avisos, noticias] = await Promise.all(promises);
     
-    const conteudo_final = [...avisos, ...noticias];
+    const content = [...avisos, ...noticias]; // Junta os resultados
     
-    if (!conteudo_final.length) {
+    if (!content.length) {
         console.warn("Nenhum conteúdo disponível.");
     } else {
         console.log(`Conteúdo carregado: ${avisos.length} aviso(s), ${noticias.length} notícia(s).`);
     }
-    return conteudo_final;
+
+    // MONTA E RETORNA O OBJETO COMPLETO QUE O FRONTEND PRECISA
+    return {
+        screenId: screen.id,
+        screenName: screen.name,
+        content: content,
+        config: {
+            carouselInterval: screenConfig.carouselInterval,
+            contentUpdateInterval: 1800 * 1000,
+        }
+    };
 }
 
 module.exports = { fetchContent };

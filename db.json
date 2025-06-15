@@ -5,9 +5,20 @@
       "name": "Tela 1",
       "layout": "layout-a",
       "config": {
-        "rssFeedUrl": "https://fct.ufg.br/feed",
+        "rssFeedUrl": "https://ufg.br/feed",
         "carouselInterval": 10000,
-        "newsQuantity": 2,
+        "newsQuantity": 3,
+        "includeAvisos": true
+      }
+    },
+    {
+      "id": "9715",
+      "name": "teste",
+      "layout": "layout-a",
+      "config": {
+        "rssFeedUrl": "https://g1.globo.com/rss/g1/brasil/",
+        "carouselInterval": 10000,
+        "newsQuantity": 1,
         "includeAvisos": false
       }
     }

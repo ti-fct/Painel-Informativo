@@ -1,46 +1,111 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    margin: 0;
-    color: #333;
+/* ======================================================= */
+/* 1. VARIÁVEIS E ESTILOS GLOBAIS
+/* ======================================================= */
+:root {
+    --color-primary: #005a9c; /* Azul UFG/FCT mais escuro e acessível */
+    --color-primary-light: #0072b9;
+    --color-dark: #212529;
+    --color-body-text: #495057;
+    --color-light-gray: #f8f9fa;
+    --color-medium-gray: #e9ecef;
+    --color-border: #dee2e6;
+    --color-white: #ffffff;
+    --color-success: #28a745;
+    --color-danger: #dc3545;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --border-radius: 8px;
 }
 
-/* --- Cabeçalho --- */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--color-light-gray);
+    color: var(--color-body-text);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ======================================================= */
+/* 2. CABEÇALHO ADMINISTRATIVO
+/* ======================================================= */
 .admin-header {
-    background-color: #fff;
-    padding: 1rem 2rem;
+    background-color: var(--color-white);
+    padding: 0 2rem;
+    box-shadow: var(--shadow-sm);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    height: 70px;
 }
 
-.admin-header h1 {
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+.logo {
+    height: 40px;
+}
+
+.logo-container h1 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-dark);
     margin: 0;
-    font-size: 1.5rem;
-    color: #0072b9;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--color-body-text);
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--color-primary);
 }
 
 .logout-button {
-    background-color: #d93025;
-    color: white;
+    background-color: var(--color-medium-gray);
+    color: var(--color-dark);
     padding: 0.5rem 1rem;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.2s;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease-in-out;
 }
 
 .logout-button:hover {
-    background-color: #b0261c;
+    background-color: var(--color-border);
+    color: var(--color-dark);
 }
 
-/* --- Conteúdo Principal --- */
+
+/* ======================================================= */
+/* 3. CONTEÚDO PRINCIPAL E CARDS
+/* ======================================================= */
 .admin-container {
     max-width: 1200px;
+    width: 100%;
     margin: 2rem auto;
     padding: 0 2rem;
+    box-sizing: border-box;
+    flex-grow: 1;
 }
 
 .toolbar {
@@ -48,131 +113,15 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .toolbar h2 {
     margin: 0;
-}
-
-.add-button {
-    background-color: #0072b9;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-.add-button:hover {
-    background-color: #005a94;
-}
-
-/* --- Lista de Telas --- */
-.screen-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.screen-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.screen-info h3 {
-    margin: 0 0 0.5rem 0;
-    color: #222;
-}
-
-.screen-info p {
-    margin: 0;
-    color: #666;
-}
-
-.screen-actions {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.action-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #f8f9fa;
-    transition: background-color 0.2s, border-color 0.2s;
-    text-decoration: none;
-    color: #333;
-    font-size: 0.9rem;
-}
-
-.action-button:hover {
-    background-color: #e9ecef;
-    border-color: #bbb;
-}
-
-.action-button.view {
-    background-color: #e7f3fe;
-    border-color: #0072b9;
-    color: #005a94;
-}
-.action-button.view:hover {
-    background-color: #d0e7fd;
-}
-
-.action-button.delete {
-    color: #d93025;
-    border-color: #f5c6cb;
-}
-.action-button.delete:hover {
-    background-color: #f8d7da;
-}
-
-/* Estilos para formulário */
-.form-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 0.5rem;
-    color: #666;
-}
-
-.form-actions {
-    text-align: right;
-    margin-top: 2rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-dark);
 }
 
 .toolbar-actions {
@@ -181,18 +130,151 @@ body {
     align-items: center;
 }
 
-.refresh-button {
-    background-color: #28a745; /* Verde */
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
+.screen-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.refresh-button:hover {
-    background-color: #218838;
+.screen-card {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s ease-in-out;
 }
+
+.screen-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.screen-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--color-dark);
+    font-size: 1.2rem;
+}
+
+.screen-info p {
+    margin: 0;
+    color: var(--color-body-text);
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.screen-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+/* ======================================================= */
+/* 4. BOTÕES
+/* ======================================================= */
+.btn {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+.btn-primary:hover {
+    background-color: #004a80;
+}
+
+.btn-secondary {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    border-color: var(--color-border);
+}
+.btn-secondary:hover {
+    background-color: var(--color-light-gray);
+}
+
+.btn-danger {
+    background-color: transparent;
+    color: var(--color-danger);
+    border-color: var(--color-border);
+}
+.btn-danger:hover {
+    background-color: var(--color-danger);
+    color: var(--color-white);
+    border-color: var(--color-danger);
+}
+
+/* ======================================================= */
+/* 5. FORMULÁRIOS
+/* ======================================================= */
+.form-card {
+    background: var(--color-white);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+}
+
+.form-group, fieldset {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--color-dark);
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="number"],
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 114, 185, 0.2);
+}
+
+fieldset {
+    border: 1px solid var(--color-border);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+}
+legend {
+    font-weight: 500;
+    color: var(--color-primary);
+    padding: 0 0.5rem;
+}
+
+.form-actions {
+    text-align: right;
+    margin-top: 2rem;
+}
+
+/* Toggle Switch (copiado do screen-form) */
+.toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--color-primary); }
+input:checked + .slider:before { transform: translateX(26px); }
+.form-group-inline { display: flex; align-items: center; justify-content: space-between; }

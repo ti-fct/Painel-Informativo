@@ -1,10 +1,19 @@
 [
   {
-    "titulo": "🎉 Bem-vindo ao Gerenciador de Avisos!",
-    "descricao": "Este é um aviso de exemplo gerado automaticamente. Você pode deletá-lo e criar novos avisos.",
-    "data_inicio": "2024-01-01 09:00",
-    "data_fim": "2029-12-31 18:00",
-    "url_imagem": "http://localhost:3000/uploads/1749491346613-wall.png",
-    "link": ""
+    "titulo": "teste",
+    "descricao": "teste",
+    "data_inicio": "2025-06-14 08:00",
+    "data_fim": "2025-06-15 08:00",
+    "link": "",
+    "url_imagem": "http://localhost:3000/uploads/1749946913965-wall.png",
+    "aviso_index": "0"
+  },
+  {
+    "titulo": "teesfdsdffdsafds dsffdsfsdasdf dfs",
+    "descricao": "fdsdsfdsfadsfa fsdfd fdsfdsadfsafdsfsdfdsdsffdsfdsdf s fddsf dfs fdsfsdfdssfdasafdsfdafsdafdsfsdfdsfsd",
+    "data_inicio": "2025-06-13 08:05",
+    "data_fim": "2025-07-06 08:00",
+    "link": "",
+    "url_imagem": "http://localhost:3000/uploads/1749949791679-depositphotos_50929921-stock-illustration-jaguar.jpg"
   }
 ]
