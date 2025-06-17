@@ -1,0 +1,34 @@
+# Define a versão do Docker Compose.
+version: '3.8'
+
+# Define os serviços (contêineres) que compõem a sua aplicação.
+services:
+  # Nome do nosso serviço. Pode ser qualquer nome, como 'app' ou 'painel'.
+  painel-informativo:
+    # 'build: .' instrui o Compose a construir a imagem a partir do Dockerfile
+    # que está no diretório atual (.).
+    build: .
+    
+    # Define o nome do contêiner para fácil identificação.
+    container_name: painel-informativo-app
+
+    # Mapeia as portas. Formato: <porta_no_host>:<porta_no_contêiner>
+    # Isso torna a aplicação acessível em http://localhost:3000 no seu servidor.
+    ports:
+      - "3000:3000"
+
+    # Mapeia volumes para persistir dados.
+    # Formato: <caminho_no_host>:<caminho_no_contêiner>
+    # Isso garante que seus JSONs e uploads não sejam perdidos.
+    volumes:
+      # Mapeia a pasta 'uploads' do host para a pasta 'uploads' no contêiner.
+      - ./uploads:/usr/src/app/uploads
+      # Mapeia o arquivo db.json do host para o arquivo no contêiner.
+      - ./db.json:/usr/src/app/db.json
+      # Mapeia o arquivo avisos.json do host para o arquivo no contêiner.
+      - ./avisos.json:/usr/src/app/avisos.json
+
+    # Política de reinicialização. 'unless-stopped' garante que o contêiner
+    # reinicie automaticamente se falhar ou se o servidor for reiniciado,
+    # a menos que você o pare manualmente.
+    restart: unless-stopped
