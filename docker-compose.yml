@@ -17,6 +17,11 @@ services:
     ports:
       - "3000:3000"
 
+    environment:
+      # Define o fuso horário para o contêiner.
+      # TZ (Time Zone) é uma variável de ambiente padrão em sistemas Linux.
+      - TZ=America/Sao_Paulo
+
     # Mapeia volumes para persistir dados.
     # Formato: <caminho_no_host>:<caminho_no_contêiner>
     # Isso garante que seus JSONs e uploads não sejam perdidos.
