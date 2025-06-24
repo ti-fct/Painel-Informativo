@@ -2,7 +2,7 @@
   "screens": [
     {
       "id": "001",
-      "name": "teste",
+      "name": "Telas Corredores",
       "layout": "layout-a",
       "config": {
         "rssFeedUrl": "https://fct.ufg.br/feed",
@@ -10,6 +10,18 @@
         "carouselInterval": 10000,
         "includeAvisos": true,
         "includeRss": true
+      }
+    },
+    {
+      "id": "002",
+      "name": "Auditório",
+      "layout": "layout-b",
+      "config": {
+        "rssFeedUrl": "https://ufg.br/feed",
+        "newsQuantity": 5,
+        "carouselInterval": 10000,
+        "includeAvisos": true,
+        "includeRss": false
       }
     }
   ]

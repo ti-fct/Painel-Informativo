@@ -110,16 +110,54 @@ const getFullImageUrl = (req, filename) => `${req.protocol}://${req.get('host')}
 // =======================================================
 // 6. LÓGICA DO WEBSOCKET
 // =======================================================
-wss.on('connection', ws => {
-    console.log('✅ Uma nova tela se conectou via WebSocket.');
-    ws.on('close', () => console.log('❌ Uma tela desconectou.'));
+// Função para enviar dados apenas para os dashboards
+function broadcastToDashboards(data) {
+    wss.clients.forEach(client => {
+        // Identifica um cliente do dashboard por uma propriedade que adicionaremos
+        if (client.isDashboard) {
+            client.send(JSON.stringify(data));
+        }
+    });
+}
+
+wss.on('connection', (ws, req) => {
+    // Verifica a URL da conexão para saber se é um dashboard
+    if (req.url === '/dashboard-ws') {
+        ws.isDashboard = true;
+        console.log('✅ Um Dashboard se conectou via WebSocket.');
+        // Envia a contagem inicial assim que o dashboard se conecta
+        broadcastToDashboards({
+            type: 'active_screens_count',
+            count: Array.from(wss.clients).filter(c => !c.isDashboard).length
+        });
+    } else {
+        ws.isDashboard = false;
+        console.log('✅ Uma Tela de Exibição se conectou via WebSocket.');
+        // Informa aos dashboards que uma nova tela se conectou
+        broadcastToDashboards({
+            type: 'active_screens_count',
+            count: Array.from(wss.clients).filter(c => !c.isDashboard).length
+        });
+    }
+
+    ws.on('close', () => {
+        console.log(`❌ Um cliente (${ws.isDashboard ? 'Dashboard' : 'Tela'}) desconectou.`);
+        // Se uma tela de exibição se desconectar, atualiza a contagem para os dashboards
+        if (!ws.isDashboard) {
+            broadcastToDashboards({
+                type: 'active_screens_count',
+                count: Array.from(wss.clients).filter(c => !c.isDashboard).length
+            });
+        }
+    });
     ws.on('error', (error) => console.error('WebSocket Error:', error));
 });
 
 function broadcastRefresh() {
-    console.log(`📡 Transmitindo comando de refresh para ${wss.clients.size} tela(s)...`);
+    console.log(`📡 Transmitindo comando de refresh para as telas...`);
     wss.clients.forEach(client => {
-        if (client.readyState === client.OPEN) {
+        // Envia o refresh apenas para as telas de exibição, não para o dashboard
+        if (!client.isDashboard && client.readyState === client.OPEN) {
             client.send('REFRESH');
         }
     });
@@ -145,7 +183,7 @@ app.get('/display/:id', async (req, res) => {
 
         // 2. Passamos esse objeto inteiro para a view.
         //    O EJS terá acesso a `screenId`, `screenName`, `content` e `config`.
-        res.render('layout-a', initialData);
+        res.render(screen.layout, initialData);
 
     } catch (error) {
         console.error("Erro ao carregar tela de exibição:", error);
@@ -186,6 +224,14 @@ app.get('/admin/dashboard', requireAuth, async (req, res) => {
 });
 app.get('/admin/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/admin/login'));
+});
+
+// NOVO: Rota para informações do servidor
+app.get('/api/server-info', requireAuth, (req, res) => {
+    res.json({
+        serverTime: new Date().toISOString(), // Envia a hora em formato padrão ISO
+        updateInterval: 1800 // Intervalo de 30 minutos em segundos
+    });
 });
 
 // --- CRUD DE TELAS ---
