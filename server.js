@@ -120,8 +120,29 @@ function broadcastToDashboards(data) {
     });
 }
 
+// Heartbeat para limpar conexões inativas
+function heartbeat() {
+    this.isAlive = true;
+}
+
+const interval = setInterval(() => {
+    wss.clients.forEach(ws => {
+        if (ws.isAlive === false) {
+            console.log(`🔌 Terminando conexão inativa (sem resposta ao ping).`);
+            return ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping(() => { });
+    });
+}, 30000);
+
 wss.on('connection', (ws, req) => {
     // Verifica a URL da conexão para saber se é um dashboard
+
+    // Inicia o controle de "vida" do cliente
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
+
     if (req.url === '/dashboard-ws') {
         ws.isDashboard = true;
         console.log('✅ Um Dashboard se conectou via WebSocket.');
@@ -142,15 +163,20 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
         console.log(`❌ Um cliente (${ws.isDashboard ? 'Dashboard' : 'Tela'}) desconectou.`);
-        // Se uma tela de exibição se desconectar, atualiza a contagem para os dashboards
-        if (!ws.isDashboard) {
-            broadcastToDashboards({
-                type: 'active_screens_count',
-                count: Array.from(wss.clients).filter(c => !c.isDashboard).length
-            });
-        }
+        // Sempre recalcula e transmite a contagem quando qualquer cliente se desconecta.
+        // Isso garante que os dashboards estejam sempre sincronizados, mesmo se um deles se reconectar.
+        // O filtro !c.isDashboard garante que a contagem em si permaneça correta.
+        broadcastToDashboards({
+            type: 'active_screens_count',
+            count: Array.from(wss.clients).filter(c => !c.isDashboard).length
+        });
     });
     ws.on('error', (error) => console.error('WebSocket Error:', error));
+});
+
+// Limpa o intervalo se o servidor for fechado
+wss.on('close', () => {
+    clearInterval(interval);
 });
 
 function broadcastRefresh() {
