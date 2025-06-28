@@ -17,6 +17,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 - **Gerenciamento de Avisos:** Um CRUD completo para criar avisos com título, descrição, período de validade e imagem. Avisos são exibidos automaticamente durante seu período de vigência.
 - **Layouts Flexíveis:**
   - **Layout A:** Exibição completa com imagem, título, data, descrição e QR Code para o link da notícia.
+  - **Layout B:** Exibição só de imagens, ideal para eventos.
 - **Atualização em Tempo Real:** Administradores podem forçar a atualização de todas as telas ativas com um único clique, graças à tecnologia WebSocket.
 - **Persistência de Dados:** Configurações de telas e avisos são salvas em arquivos JSON, funcionando como um banco de dados simples.
 
@@ -46,11 +47,11 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 │   └── logo.png
 ├── uploads/               # Pasta para as imagens dos avisos (criada automaticamente)
 ├── views/                 # Arquivos de template EJS
-│   ├── partials/          # (Opcional) Partes reutilizáveis como header/footer
-│   ├── ...
 ├── avisos.json            # "Banco de dados" para os avisos
 ├── content-manager.js     # Lógica para buscar e processar conteúdo
 ├── db.json                # "Banco de dados" para as telas
+├── Dockerfile             # Define a imagem Docker da aplicação
+├── docker-compose.yml     # Orquestra o container para deploy facilitado
 ├── package.json           # Dependências e scripts do projeto
 └── server.js              # Servidor principal (coração da aplicação)
 ```
@@ -69,14 +70,14 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
     cd [NOME_DA_PASTA_DO_PROJETO]
     ```
 
-2.  **Instale as dependências:**
+2.  **Crie os arquivos de dados iniciais para evitar erros de volume no Docker.:**
     ```bash
-    npm install
+    touch db.json avisos.json
     ```
 
-3.  **Execute o servidor:**
+3.  **Suba o serviço com o Docker Compose:**
     ```bash
-    node server.js
+    docker-compose up -d
     ```
 
 4.  **Acesse a aplicação:**
@@ -95,7 +96,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 Após o login, você verá o dashboard principal, que lista todas as telas criadas. A partir daqui, você pode:
 - **Adicionar Nova Tela:** Inicia o processo de criação de uma nova tela de exibição.
 - **Gerenciar Avisos:** Leva para a interface de gerenciamento de avisos.
-- **Forçar Atualização (F5):** Envia um comando para que todas as telas públicas abertas recarreguem seu conteúdo imediatamente.
+- **Forçar Atualização de Telas:** Envia um comando para que todas as telas públicas abertas recarreguem seu conteúdo imediatamente.
 
 ### Criando/Editando uma Tela
 - **Nome da Tela:** Um nome descritivo (ex: "Tela da Biblioteca", "Painel do Auditório").
@@ -103,7 +104,7 @@ Após o login, você verá o dashboard principal, que lista todas as telas criad
   - **Exibir Avisos Globais:** Marque para que esta tela mostre os avisos ativos.
   - **Exibir Notícias de Feed RSS:** Marque para ativar a busca por notícias. Os campos de URL e quantidade se tornarão visíveis e obrigatórios.
 - **Configurações de Exibição:**
-  - **Layout:** Escolha o layout visual para a tela (atualmente, "Layout A").
+  - **Layout:** Escolha o layout visual para a tela.
   - **Intervalo do Carrossel:** Tempo em milissegundos que cada slide (notícia ou aviso) ficará visível.
 
 ### Gerenciando Avisos
@@ -114,16 +115,14 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 
 ## Próximos Passos e Melhorias Futuras
 
-- [ ] Configurar Docker para ambiente de produção.
 - [ ] Implementar um sistema de autenticação mais robusto e criptografia.
-- [ ] Adicionar mais layouts de tela (ex: Layout B apenas com imagens, Layout C com vídeo e texto).
+- [ ] Melhorar Gerenciamento de Dados (race condition)
+- [ ] Otimizar Atualizações de Conteúdo com WebSockets
 - [ ] Permitir a configuração de múltiplas fontes de conteúdo (mais de um feed RSS) por tela.
 - [ ] Criar uma interface para visualizar logs de erros do servidor.
-- [ ] Implementar quantas telas estão conectadas no dashboad.
-- [ ] Melhorias no códgio e UX.
-
-
-
+- [ ] Melhorias no código e UX.
+- [ ] Implementar estratégias de cache inteligentes com Service Worker. (Exige HTTPS)
+- [ ] Implementar HTTPS com Certificado Autoassinado (o certificado tem que ser instalado manualmente em cada dispositivo)
 ---
 
 *Este projeto foi desenvolvido por TI FCT.*
