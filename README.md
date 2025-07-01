@@ -78,6 +78,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 3.  **Suba o serviço com o Docker Compose:**
     ```bash
     docker-compose up -d
+    docker-compose up --build -d (para atualizar o serviço já em funcionamento, lembre-se de copiar as pastas uploads e arquivos json)
     ```
 
 4.  **Acesse a aplicação:**
