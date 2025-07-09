@@ -9,7 +9,8 @@ const AVISOS_DB_PATH = path.join(__dirname, 'avisos.json');
 const parser = new RssParser();
 const LIMITE_DESCRICAO_CARACTERES = 1200;
 
-async function _carregarAvisosAtivos() {
+// A função agora recebe o ID da tela que está pedindo os avisos
+async function _carregarAvisosAtivos(screenId) {
     try {
         const data = await fs.readFile(AVISOS_DB_PATH, 'utf-8');
         const avisos = JSON.parse(data);
@@ -17,10 +18,18 @@ async function _carregarAvisosAtivos() {
 
         const avisosAtivos = avisos
             .filter(aviso => {
+                // 1. Filtro por data (lógica existente)
                 if (!aviso.data_inicio || !aviso.data_fim) return false;
                 const dataInicio = new Date(aviso.data_inicio.replace(' ', 'T'));
                 const dataFim = new Date(aviso.data_fim.replace(' ', 'T'));
-                return !isNaN(dataInicio) && !isNaN(dataFim) && dataInicio <= agora && agora <= dataFim;
+                const isDateValid = !isNaN(dataInicio) && !isNaN(dataFim) && dataInicio <= agora && agora <= dataFim;
+                if (!isDateValid) return false;
+                
+                // 2. Novo filtro por tela de destino
+                const isGlobal = !aviso.targetScreens || aviso.targetScreens.length === 0;
+                const isTargeted = Array.isArray(aviso.targetScreens) && aviso.targetScreens.includes(screenId);
+
+                return isGlobal || isTargeted;
             })
             .map(aviso => {
                 const dataFimFormatada = format(new Date(aviso.data_fim.replace(' ', 'T')), "dd/MM/yyyy 'às' HH:mm");
@@ -51,6 +60,7 @@ async function _carregarAvisosAtivos() {
  * @returns {Promise<Array>} Uma promessa que resolve para um array de objetos de notícia.
  */
 async function _carregarNoticiasFeed(screenConfig) {
+    // ... (nenhuma mudança nesta função)
     try {
         const feedUrl = screenConfig.rssFeedUrl;
         if (!feedUrl) return [];
@@ -63,24 +73,17 @@ async function _carregarNoticiasFeed(screenConfig) {
             const content = item['content:encoded'] || item.content || '';
             const $ = cheerio.load(content);
 
-            // =======================================================
-            // LÓGICA DE CORREÇÃO DA IMAGEM (APENAS SITES UFG.BR)
-            // =======================================================
             let url_imagem = $('img').first().attr('src');
             if (url_imagem) {
                 const urlLower = url_imagem.toLowerCase();
-                // Verifica se a URL contém a duplicação "fct.ufg.brhttp"
                 if (urlLower.includes("fct.ufg.brhttp") || urlLower.includes("ufg.brhttp")) {
-                    // Encontra o início da segunda URL 'http' (ignorando a primeira)
                     const startIndex = urlLower.indexOf("http", 1);
                     if (startIndex !== -1) {
-                        // Extrai a parte correta da string original, preservando o case
                         url_imagem = url_imagem.substring(startIndex);
                         console.log(`URL da imagem corrigida para: ${url_imagem}`);
                     }
                 }
             }
-            // =======================================================
 
             $('script, style').remove();
             let descricao = $('body').text().replace(/\s\s+/g, ' ').trim();
@@ -102,7 +105,7 @@ async function _carregarNoticiasFeed(screenConfig) {
                 titulo: item.title,
                 descricao: descricao,
                 link: item.link,
-                url_imagem: url_imagem, // Usa a URL, corrigida ou não
+                url_imagem: url_imagem,
                 data: data_formatada,
                 tipo: 'noticia'
             });
@@ -116,13 +119,14 @@ async function _carregarNoticiasFeed(screenConfig) {
 
 async function fetchContent(screen) { // Recebe o objeto screen inteiro
     const screenConfig = screen.config || {};
-    console.log(`Iniciando atualização de conteúdo para: ${screen.name || 'Tela sem nome'}`);
+    console.log(`Iniciando atualização de conteúdo para: ${screen.name || 'Tela sem nome'} (ID: ${screen.id})`);
 
     const promises = [];
 
     // Adiciona a busca de avisos apenas se a config permitir.
     if (screenConfig.includeAvisos !== false) {
-        promises.push(_carregarAvisosAtivos());
+        // Passa o ID da tela para a função
+        promises.push(_carregarAvisosAtivos(screen.id));
     } else {
         promises.push(Promise.resolve([])); // Retorna um array vazio se não for para incluir
         console.log('Avisos globais ignorados para esta tela, conforme configuração.');
@@ -136,10 +140,8 @@ async function fetchContent(screen) { // Recebe o objeto screen inteiro
         console.log('Feed RSS ignorado para esta tela, conforme configuração.');
     }
 
-    // Executa as buscas em paralelo
     const [avisos, noticias] = await Promise.all(promises);
-
-    const content = [...avisos, ...noticias]; // Junta os resultados
+    const content = [...avisos, ...noticias];
 
     if (!content.length) {
         console.warn("Nenhum conteúdo disponível.");
@@ -147,7 +149,6 @@ async function fetchContent(screen) { // Recebe o objeto screen inteiro
         console.log(`Conteúdo carregado: ${avisos.length} aviso(s), ${noticias.length} notícia(s).`);
     }
 
-    // MONTA E RETORNA O OBJETO COMPLETO QUE O FRONTEND PRECISA
     return {
         screenId: screen.id,
         screenName: screen.name,

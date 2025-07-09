@@ -14,53 +14,71 @@
     <%- include('_admin-footer') %>
 
         <div id="aviso-modal" class="modal">
-            <div class="form-card" style="width: 100%; max-width: 600px; position: relative;">
-                <span id="close-modal-btn"
-                    style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; cursor: pointer; line-height: 1;">×</span>
-                <h2 id="modal-title" style="margin-top: 0; margin-bottom: 2rem;">Adicionar Novo Aviso</h2>
+            <!-- O .form-card agora organiza o layout interno -->
+            <div class="form-card">
+                
+                <!-- 1. CABEÇALHO DO MODAL (FIXO) -->
+                <div class="form-card-header">
+                    <h2 id="modal-title">Adicionar Novo Aviso</h2>
+                    <span id="close-modal-btn" class="close-button" title="Fechar">×</span>
+                </div>
 
-                <form id="aviso-form">
-                    <input type="hidden" id="aviso_index" name="aviso_index">
+                <!-- 2. CORPO DO MODAL (ROLÁVEL) -->
+                <div class="form-card-body">
+                    <form id="aviso-form">
+                        <input type="hidden" id="aviso_index" name="aviso_index">
 
-                    <!-- Os inputs estão diretamente dentro do form, e os labels associados por 'for' -->
-                    <!-- O .form-group será usado no CSS para espaçamento -->
-                    <div class="form-group">
-                        <label for="titulo">Título</label>
-                        <input type="text" id="titulo" name="titulo" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descricao">Descrição</label>
-                        <textarea id="descricao" name="descricao" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="data_inicio">Data de Início</label>
-                        <input type="datetime-local" id="data_inicio" name="data_inicio" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="data_fim">Data de Fim</label>
-                        <input type="datetime-local" id="data_fim" name="data_fim" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="url_imagem">Imagem do Aviso (Opcional)</label>
-                        <input type="file" id="url_imagem" name="url_imagem" accept="image/*">
-                    </div>
-                    <div class="form-group">
-                        <label for="link">Link Externo (Opcional)</label>
-                        <input type="url" id="link" name="link" placeholder="https://exemplo.com">
-                    </div>
+                        <div class="form-group">
+                            <label for="titulo">Título</label>
+                            <input type="text" id="titulo" name="titulo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <textarea id="descricao" name="descricao" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_inicio">Data de Início</label>
+                            <input type="datetime-local" id="data_inicio" name="data_inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_fim">Data de Fim</label>
+                            <input type="datetime-local" id="data_fim" name="data_fim" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="url_imagem">Imagem do Aviso (Opcional)</label>
+                            <input type="file" id="url_imagem" name="url_imagem" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="link">Link Externo (Opcional)</label>
+                            <input type="url" id="link" name="link" placeholder="https://exemplo.com">
+                        </div>
 
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancel-modal-btn">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Aviso</button>
-                    </div>
-                </form>
+                        <fieldset>
+                            <legend>Telas de Exibição</legend>
+                            <small style="display: block; margin: -0.5rem 0 1rem 0;">Se nenhuma tela for selecionada, o aviso será exibido em todas.</small>
+                            <div id="target-screens-container">
+                                <!-- Checkboxes -->
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+
+                <!-- 3. RODAPÉ DO MODAL (FIXO) -->
+                <div class="form-card-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-modal-btn">Cancelar</button>
+                    <!-- O atributo 'form' garante que este botão envie o formulário 'aviso-form' -->
+                    <button type="submit" class="btn btn-primary" form="aviso-form">Salvar Aviso</button>
+                </div>
+
             </div>
         </div>
 
         <div id="toast"></div>
 
+        <script>
+            const allScreens = <%- JSON.stringify(screens) %>;
+        </script>
         <script src="/js/avisos.js"></script>
 
         </body>
-
         </html>

@@ -10,6 +10,34 @@ const { WebSocketServer } = require('ws');
 const multer = require('multer');
 
 // =======================================================
+// NOVA SEÇÃO: Melhoria nos Logs com Timestamp
+// =======================================================
+// Salva as funções de log originais
+const originalLog = console.log;
+const originalWarn = console.warn;
+const originalError = console.error;
+
+// Função para obter o timestamp formatado
+const getTimestamp = () => new Date().toLocaleString('pt-BR');
+
+// Sobrescreve console.log com nível INFO
+console.log = function(...args) {
+    originalLog(`[${getTimestamp()}] [INFO]`, ...args);
+};
+
+// Sobrescreve console.warn com nível WARN
+console.warn = function(...args) {
+    originalWarn(`[${getTimestamp()}] [WARN]`, ...args);
+};
+
+// Sobrescreve console.error com nível ERROR
+console.error = function(...args) {
+    originalError(`[${getTimestamp()}] [ERROR]`, ...args);
+};
+// =======================================================
+
+
+// =======================================================
 // 2. CONSTANTES E INICIALIZAÇÃO
 // =======================================================
 const PORT = 3000;
@@ -348,8 +376,17 @@ app.post('/admin/refresh-all', requireAuth, (req, res) => {
     broadcastRefresh();
     res.redirect('/admin/dashboard');
 });
-app.get('/admin/avisos', requireAuth, (req, res) => {
-    res.render('avisos');
+
+// MODIFICAÇÃO: Passar a lista de telas para a view
+app.get('/admin/avisos', requireAuth, async (req, res) => {
+    try {
+        const db = await readDB();
+        // Passa a lista de telas para que o formulário possa renderizar as opções
+        res.render('avisos', { screens: db.screens || [] });
+    } catch (error) {
+        console.error("Erro ao carregar página de avisos:", error);
+        res.status(500).render('avisos', { screens: [] }); // Renderiza a página mesmo com erro
+    }
 });
 
 // =======================================================
@@ -359,33 +396,44 @@ app.get('/api/avisos', async (req, res) => {
     const avisos = await readAvisos();
     res.json(avisos);
 });
+
+// MODIFICAÇÃO: Capturar e salvar 'targetScreens'
 app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, res) => {
-    const { titulo, descricao, data_inicio, data_fim, link } = req.body;
+    const { titulo, descricao, data_inicio, data_fim, link, targetScreens } = req.body;
     if (!titulo || !descricao) {
         return res.status(400).json({ success: false, message: 'Título e descrição são obrigatórios.' });
     }
+
+    // Garante que 'targetScreens' seja sempre um array
+    const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
+
     const avisos = await readAvisos();
     const newAviso = {
         titulo, descricao, data_inicio, data_fim, link: link || '',
-        url_imagem: req.file ? getFullImageUrl(req, req.file.filename) : ''
+        url_imagem: req.file ? getFullImageUrl(req, req.file.filename) : '',
+        targetScreens: screensArray // Salva o array de telas
     };
     avisos.push(newAviso);
     await writeAvisos(avisos);
     broadcastRefresh();
     res.status(201).json({ success: true, message: 'Aviso criado com sucesso!' });
 });
+
+// MODIFICAÇÃO: Capturar e atualizar 'targetScreens'
 app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (req, res) => {
     const avisos = await readAvisos();
     const index = parseInt(req.params.index);
     if (index < 0 || index >= avisos.length) return res.status(404).json({ success: false, message: 'Aviso não encontrado.' });
 
-    // Pega os dados antigos e sobrepõe com os novos
-    const updatedAviso = { ...avisos[index], ...req.body };
-    delete updatedAviso.aviso_index; // Remove o campo do frontend
+    // Garante que 'targetScreens' seja sempre um array
+    const { targetScreens, ...otherBodyData } = req.body;
+    const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
+    
+    const updatedAviso = { ...avisos[index], ...otherBodyData, targetScreens: screensArray };
+    delete updatedAviso.aviso_index;
 
     if (req.file) {
         updatedAviso.url_imagem = getFullImageUrl(req, req.file.filename);
-        // Lógica para remover imagem antiga (se existir e for local)
     }
     avisos[index] = updatedAviso;
     await writeAvisos(avisos);

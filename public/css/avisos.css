@@ -79,21 +79,86 @@
     gap: 0.75rem;
 }
 
-/* Estilos para o Modal */
+/* ======================================================= */
+/* ESTILOS APRIMORADOS PARA O MODAL
+/* ======================================================= */
 .modal {
-    display: none;
+    display: none; /* Inicia oculto */
     position: fixed;
     z-index: 1001;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: auto; /* Permite rolar o fundo escuro se necessário */
     background-color: rgba(0, 0, 0, 0.6);
+    display: flex; /* Mantido para centralização */
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 1rem; /* Espaçamento de segurança em telas pequenas */
+    box-sizing: border-box;
 }
+
+/* O .form-card dentro do modal */
+.modal .form-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 650px; /* Um pouco mais largo para acomodar o conteúdo */
+    max-height: 90vh; /* NUNCA será mais alto que 90% da tela */
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden; /* Garante que os cantos arredondados funcionem */
+}
+
+/* Cabeçalho do Modal */
+.form-card-header {
+    flex-shrink: 0; /* Impede que o cabeçalho encolha */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.form-card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--color-dark);
+}
+
+/* Botão de Fechar Aprimorado */
+.close-button {
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+.close-button:hover {
+    color: var(--color-dark);
+}
+
+/* Corpo do Modal (área de rolagem) */
+.form-card-body {
+    flex-grow: 1; /* Faz esta área crescer para preencher o espaço */
+    overflow-y: auto; /* Adiciona barra de rolagem vertical QUANDO necessário */
+    padding: 1.5rem;
+}
+
+/* Rodapé do Modal */
+.form-card-footer {
+    flex-shrink: 0; /* Impede que o rodapé encolha */
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background-color: var(--color-light-gray);
+    border-top: 1px solid var(--color-border);
+}
+
 
 /* Estilo para o Toast de notificação */
 #toast {
