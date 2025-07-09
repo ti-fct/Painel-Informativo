@@ -237,6 +237,7 @@ app.get('/api/content/:id', async (req, res) => {
 app.get('/', (req, res) => res.redirect('/admin/login'));
 app.get('/admin/login', (req, res) => res.render('login', { error: null }));
 app.post('/admin/login', (req, res) => {
+    // ALTERE AQUI A SENHA DE LOGIN DO SITEMA
     if (req.body.username === 'admin' && req.body.password === 'admin') {
         req.session.isLoggedIn = true;
         res.redirect('/admin/dashboard');
