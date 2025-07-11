@@ -9,9 +9,13 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const multer = require('multer');
 
+// Carregar variáveis de ambiente do arquivo .env
+require('dotenv').config();
+
 // =======================================================
-// NOVA SEÇÃO: Melhoria nos Logs com Timestamp
+// Melhoria nos Logs com Timestamp
 // =======================================================
+
 // Salva as funções de log originais
 const originalLog = console.log;
 const originalWarn = console.warn;
@@ -34,7 +38,6 @@ console.warn = function(...args) {
 console.error = function(...args) {
     originalError(`[${getTimestamp()}] [ERROR]`, ...args);
 };
-// =======================================================
 
 
 // =======================================================
@@ -264,9 +267,14 @@ app.get('/api/content/:id', async (req, res) => {
 // --- ROTAS DE ADMINISTRAÇÃO ---
 app.get('/', (req, res) => res.redirect('/admin/login'));
 app.get('/admin/login', (req, res) => res.render('login', { error: null }));
+
 app.post('/admin/login', (req, res) => {
-    // ALTERE AQUI A SENHA DE LOGIN DO SITEMA
-    if (req.body.username === 'admin' && req.body.password === 'admin') {
+    // Lê as credenciais das variáveis de ambiente
+    const adminUser = process.env.ADMIN_USERNAME || 'admin';
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin'; // 'admin' como fallback de segurança
+
+    // ALTERADO: Comparação com as variáveis de ambienteNPM
+    if (req.body.username === adminUser && req.body.password === adminPass) {
         req.session.isLoggedIn = true;
         res.redirect('/admin/dashboard');
     } else {

@@ -1,11 +1,24 @@
 [
   {
-    "titulo": "Aviso 2 ",
-    "descricao": "Este aviso deve aparecer em todas as telas.",
-    "data_inicio": "2025-06-24 08:00",
-    "data_fim": "2025-09-28 08:00",
+    "titulo": "Aviso Exemplo 1",
+    "descricao": "Descrição do aviso 1",
+    "data_inicio": "2025-07-10 08:00",
+    "data_fim": "2025-07-11 08:00",
     "link": "",
-    "url_imagem": "http://localhost:3000/uploads/1750791271025-WhatsApp_Image_2025-06-24_at_11.00.17.jpeg",
-    "targetScreens": []
+    "url_imagem": "http://localhost:3000/uploads/1752189935643-aviso1.jpg",
+    "targetScreens": [
+      "001"
+    ]
+  },
+  {
+    "titulo": "Aviso Exemplo 2",
+    "descricao": "Descrição do aviso 2",
+    "data_inicio": "2025-07-10 08:00",
+    "data_fim": "2025-07-11 08:00",
+    "link": "",
+    "url_imagem": "http://localhost:3000/uploads/1752189996011-aviso2.jpg",
+    "targetScreens": [
+      "001"
+    ]
   }
 ]

@@ -2,24 +2,24 @@
   "screens": [
     {
       "id": "001",
-      "name": "Telas Corredores",
+      "name": "Tela Exemplo 1",
       "layout": "layout-a",
       "config": {
         "rssFeedUrl": "https://fct.ufg.br/feed",
-        "newsQuantity": 3,
-        "carouselInterval": 10000,
+        "newsQuantity": 5,
+        "carouselInterval": 20000,
         "includeAvisos": true,
         "includeRss": true
       }
     },
     {
       "id": "002",
-      "name": "Auditório",
+      "name": "Tela Exemplo 2",
       "layout": "layout-b",
       "config": {
         "rssFeedUrl": "https://ufg.br/feed",
         "newsQuantity": 5,
-        "carouselInterval": 10000,
+        "carouselInterval": 20000,
         "includeAvisos": true,
         "includeRss": false
       }

@@ -23,7 +23,9 @@ html {
 
 .main-header h1 {
     margin: 0;
-    font-size: 1.5em; /* Usa em para melhor responsividade */
+    padding-top: 8px;   /* AJUSTE BORDAS DA IMPRESSAO 3D - GULHERME*/
+    font-size: 28px;
+    font-weight: bold;
 }
 
 /* --- Contêiner Principal --- */
