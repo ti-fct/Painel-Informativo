@@ -1,0 +1,180 @@
+/* --- Reset e Estilos Globais --- */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+/* --- Cabeçalho --- */
+.main-header {
+    background-color: #0072b9;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* --- Contêiner Principal --- */
+.content-container {
+    display: flex;
+    height: calc(100vh - 60px);
+    /* Altura total menos o cabeçalho */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.carousel-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.carousel-item-content {
+    flex-grow: 1;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+    /* Evita que conteúdo vaze */
+}
+
+/* --- Layout Responsivo (Breakpoint) --- */
+
+/* TELA GRANDE (>= 900px): Horizontal */
+.image-container {
+    flex: 2;
+    /* 40% */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    position: relative;
+}
+
+.text-container {
+    flex: 3;
+    /* 60% */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* TELA PEQUENA (< 900px): Vertical */
+@media (max-width: 899px) {
+    .carousel-item-content {
+        flex-direction: column;
+    }
+
+    .image-container {
+        min-height: 200px;
+        /* Garante altura mínima na vertical */
+        max-height: 40%;
+    }
+}
+
+.image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: none;
+    /* Escondido até carregar */
+}
+
+.image-container .image-placeholder {
+    color: #888;
+}
+
+/* --- Conteúdo de Texto --- */
+#carousel-title {
+    font-size: 2.2vw;
+    font-weight: bold;
+    color: #0072b9;
+    margin: 0 0 10px 0;
+}
+
+#carousel-date {
+    font-size: 1.2vw;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.description-scroll-area {
+    flex-grow: 1;
+    overflow-y: scroll;
+    /* A rolagem será controlada por JS */
+    -ms-overflow-style: none;
+    /* IE e Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    padding-right: 15px;
+}
+
+.description-scroll-area::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari e Opera */
+}
+
+#carousel-description {
+    font-size: 1.8vw;
+    color: #333;
+    text-align: justify;
+}
+
+/* --- QR Code --- */
+.qr-code-container {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+#qr-code {
+    width: 150px;
+    height: 150px;
+}
+
+/* --- Barra de Progresso --- */
+.progress-bar-container {
+    height: 5px;
+    width: 100%;
+    background-color: transparent;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #0072b9;
+    transition: width 0.1s linear;
+}
+
+/* Ajustes de fonte responsivos para telas pequenas */
+@media (max-width: 899px) {
+    #carousel-title {
+        font-size: 24px;
+    }
+
+    #carousel-date {
+        font-size: 16px;
+    }
+
+    #carousel-description {
+        font-size: 18px;
+    }
+}

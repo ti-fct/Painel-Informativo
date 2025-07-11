@@ -1,0 +1,84 @@
+<%- include('_admin-header', { pageTitle: 'Gerenciar Avisos' }) %>
+
+    <link rel="stylesheet" href="/css/avisos.css">
+
+    <div class="toolbar">
+        <h2>Gerenciar Avisos</h2>
+        <button class="btn btn-primary" id="add-aviso-btn">Adicionar Novo Aviso</button>
+    </div>
+
+    <div id="avisos-grid">
+        <!-- Conteúdo gerado pelo JavaScript -->
+    </div>
+
+    <%- include('_admin-footer') %>
+
+        <div id="aviso-modal" class="modal">
+            <!-- O .form-card agora organiza o layout interno -->
+            <div class="form-card">
+                
+                <!-- 1. CABEÇALHO DO MODAL (FIXO) -->
+                <div class="form-card-header">
+                    <h2 id="modal-title">Adicionar Novo Aviso</h2>
+                    <span id="close-modal-btn" class="close-button" title="Fechar">×</span>
+                </div>
+
+                <!-- 2. CORPO DO MODAL (ROLÁVEL) -->
+                <div class="form-card-body">
+                    <form id="aviso-form">
+                        <input type="hidden" id="aviso_index" name="aviso_index">
+
+                        <div class="form-group">
+                            <label for="titulo">Título</label>
+                            <input type="text" id="titulo" name="titulo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <textarea id="descricao" name="descricao" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_inicio">Data de Início</label>
+                            <input type="datetime-local" id="data_inicio" name="data_inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_fim">Data de Fim</label>
+                            <input type="datetime-local" id="data_fim" name="data_fim" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="url_imagem">Imagem do Aviso (Opcional)</label>
+                            <input type="file" id="url_imagem" name="url_imagem" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="link">Link Externo (Opcional)</label>
+                            <input type="url" id="link" name="link" placeholder="https://exemplo.com">
+                        </div>
+
+                        <fieldset>
+                            <legend>Telas de Exibição</legend>
+                            <small style="display: block; margin: -0.5rem 0 1rem 0;">Se nenhuma tela for selecionada, o aviso será exibido em todas.</small>
+                            <div id="target-screens-container">
+                                <!-- Checkboxes -->
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+
+                <!-- 3. RODAPÉ DO MODAL (FIXO) -->
+                <div class="form-card-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-modal-btn">Cancelar</button>
+                    <!-- O atributo 'form' garante que este botão envie o formulário 'aviso-form' -->
+                    <button type="submit" class="btn btn-primary" form="aviso-form">Salvar Aviso</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="toast"></div>
+
+        <script>
+            const allScreens = <%- JSON.stringify(screens) %>;
+        </script>
+        <script src="/js/avisos.js"></script>
+
+        </body>
+        </html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Interativo FCT</title>
+    <link rel="stylesheet" href="/css/layout-a.css">
+</head>
+
+<body data-screen-id="<%= screenId %>">
+    <header class="main-header">
+        <h1>Painel Informativo FCT/UFG</h1>
+    </header>
+
+    <main class="content-container">
+        <div class="carousel-wrapper">
+            <!-- Layout Horizontal/Vertical controlado por CSS -->
+            <div class="carousel-item-content">
+                <div class="image-container">
+                    <img id="carousel-image" src="" alt="Imagem da notícia">
+                    <div class="image-placeholder">Carregando imagem...</div>
+                </div>
+                <div class="text-container">
+                    <h2 id="carousel-title">Carregando conteúdo...</h2>
+                    <p id="carousel-date"></p>
+                    <div class="description-scroll-area">
+                        <div id="carousel-description"></div>
+                    </div>
+                    <div class="qr-code-container">
+                        <div id="qr-code"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Passando dados do servidor para o JavaScript do cliente -->
+    <script>
+    const initialData = <%- JSON.stringify({ screenId, screenName, content, config }) %>;
+    </script>
+
+    <!-- Bibliotecas e nosso script principal -->
+    <script src="/js/qrcode.min.js"></script>
+    <script src="/js/display.js"></script>
+</body>
+
+</html>

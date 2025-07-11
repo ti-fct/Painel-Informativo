@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Painel Administrativo</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* Estilos específicos para a página de login */
+        body.login-page {
+            justify-content: center;
+            align-items: center;
+            background-color: var(--color-light-gray);
+        }
+
+        .login-container {
+            background: var(--color-white);
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border-top: 4px solid var(--color-primary);
+        }
+
+        .login-logo {
+            max-width: 200px;
+            margin-bottom: 2rem;
+        }
+
+        .login-container h2 {
+            margin-bottom: 2rem;
+            color: var(--color-dark);
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-body-text);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            color: var(--color-danger);
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <img src="/logo.png" alt="Logo" class="login-logo">
+        <h2>Acesso ao Painel</h2>
+        <form action="/admin/login" method="POST">
+            <% if (error) { %>
+                <p class="error-message">
+                    <%= error %>
+                </p>
+                <% } %>
+                    <div class="input-group">
+                        <label for="username">Usuário</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login">Entrar</button>
+        </form>
+    </div>
+</body>
+
+</html>

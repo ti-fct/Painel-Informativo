@@ -1,0 +1,101 @@
+<%- include('_admin-header', { pageTitle: pageTitle }) %>
+
+    <form action="<%= formAction %>" method="POST" class="form-card">
+        <div class="form-group">
+            <label for="name">Nome da Tela</label>
+            <input type="text" id="name" name="name" required placeholder="Ex: Tela da Biblioteca"
+                value="<%= screen ? screen.name : '' %>">
+        </div>
+
+        <fieldset>
+            <legend>Fontes de Conteúdo</legend>
+            <div class="form-group form-group-inline">
+                <label for="includeAvisos">Exibir Avisos</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="includeAvisos" name="includeAvisos" value="true" <% if (!screen ||
+                        screen.config.includeAvisos !==false) { %>checked<% } %>>
+                        <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group form-group-inline">
+                <label for="includeRss">Exibir Notícias de Feed RSS</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="includeRss" name="includeRss" value="true" <% if (!screen ||
+                        screen.config.includeRss !==false) { %>checked<% } %>>
+                        <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="rss-fields-container">
+                <div class="form-group">
+                    <label for="rssFeedUrl">URL do Feed RSS</label>
+                    <input type="url" id="rssFeedUrl" name="rssFeedUrl" placeholder="https://exemplo.com/feed"
+                        value="<%= screen ? screen.config.rssFeedUrl : '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="newsQuantity">Quantidade de Notícias</label>
+                    <input type="number" id="newsQuantity" name="newsQuantity" min="1" max="20"
+                        value="<%= screen ? (screen.config.newsQuantity || 5) : '5' %>">
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset>
+            <legend>Configurações de Exibição</legend>
+            <div class="form-group">
+                <label for="layout">Layout</label>
+                <select id="layout" name="layout">
+                    <option value="layout-a" <%=(screen && screen.layout==='layout-a' ) ? 'selected' : '' %>>
+                        Layout A (Imagem + Texto)
+                    </option>
+                    <option value="layout-b" <%=(screen && screen.layout==='layout-b' ) ? 'selected' : '' %>>
+                        Layout B (Somente para Avisos - Imagens)
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="carouselInterval">Intervalo do Carrossel (ms)</label>
+                <input type="number" id="carouselInterval" name="carouselInterval" min="5000" step="1000" required
+                    value="<%= screen ? screen.config.carouselInterval : '20000' %>">
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <%= screen ? 'Atualizar Tela' : 'Salvar Tela' %>
+            </button>
+        </div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const includeRssToggle = document.getElementById('includeRss');
+            const rssUrlInput = document.getElementById('rssFeedUrl');
+            const newsQuantityInput = document.getElementById('newsQuantity');
+
+            function toggleRssFields() {
+                // Se o toggle estiver LIGADO
+                if (includeRssToggle.checked) {
+                    rssUrlInput.disabled = false;
+                    newsQuantityInput.disabled = false;
+                    rssUrlInput.required = true; // Torna o campo obrigatório
+                } else { // Se o toggle estiver DESLIGADO
+                    rssUrlInput.disabled = true;
+                    newsQuantityInput.disabled = true;
+                    rssUrlInput.required = false; // Deixa de ser obrigatório
+                }
+            }
+
+            // Executa a função quando a página carrega
+            toggleRssFields();
+
+            // Adiciona o listener para futuras mudanças no toggle
+            includeRssToggle.addEventListener('change', toggleRssFields);
+        });
+    </script>
+
+    <%- include('_admin-footer') %>
+        </body>
+
+        </html>

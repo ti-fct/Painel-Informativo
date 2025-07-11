@@ -1,0 +1,96 @@
+<%- include('_admin-header', { pageTitle: 'Dashboard' }) %>
+
+    <!-- NOVO: Estilos para a barra de informações -->
+    <style>
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--color-white);
+            padding: 1rem 2rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-item .label {
+            font-size: 0.8rem;
+            color: var(--color-body-text);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+    </style>
+
+    <!-- NOVO: Barra de informações -->
+    <div class="info-bar">
+        <div class="info-item">
+            <span class="label">Telas Ativas</span>
+            <span class="value" id="screens-count">0</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Hora do Servidor</span>
+            <span class="value" id="server-time">--:--:--</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Próxima Atualização de RSS</span>
+            <span class="value" id="update-timer">--:--</span>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <h2>Gerenciar Telas</h2>
+        <div class="toolbar-actions">
+            <form action="/admin/refresh-all" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-secondary">Forçar Atualização de Telas</button>
+            </form>
+            <a href="/admin/screen/new" class="btn btn-primary">Adicionar Nova Tela</a>
+        </div>
+    </div>
+
+    <section class="screen-list">
+        <% if (screens.length===0) { %>
+            <p>Nenhuma tela cadastrada ainda.</p>
+            <% } else { %>
+                <% screens.forEach(screen=> { %>
+                    <div class="screen-card">
+                        <div class="screen-info">
+                            <h3>
+                                <%= screen.name %> <small style="font-weight: 400; color: #6c757d;">(ID: <%= screen.id
+                                            %>)</small>
+                            </h3>
+                            <p>RSS: <%= screen.config.rssFeedUrl %>
+                            </p>
+                        </div>
+                        <div class="screen-actions">
+                            <a href="/display/<%= screen.id %>" target="_blank" class="btn btn-secondary">Visualizar</a>
+                            <a href="/admin/screen/edit/<%= screen.id %>" class="btn btn-secondary">Editar</a>
+                            <form action="/admin/screen/delete/<%= screen.id %>" method="POST" style="display: inline;"
+                                onsubmit="return confirm('Tem certeza que deseja excluir esta tela?');">
+                                <button type="submit" class="btn btn-danger">Excluir</button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }); %>
+                        <% } %>
+    </section>
+
+    <%- include('_admin-footer') %>
+
+        <script src="/js/dashboard.js"></script>
+        </body>
+
+        </html>
