@@ -17,7 +17,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 - **Gerenciamento de Avisos:** Um CRUD completo para criar avisos com título, descrição, período de validade e imagem. Avisos são exibidos automaticamente durante seu período de vigência.
 - **Layouts Flexíveis:**
   - **Layout A:** Exibição completa com imagem, título, data, descrição e QR Code para o link da notícia.
-  - **Layout B:** Exibição só de imagens, ideal para eventos.
+  - **Layout B:** Exibição só de imagens, ideal para avisos.
 - **Atualização em Tempo Real:** Administradores podem forçar a atualização de todas as telas ativas com um único clique, graças à tecnologia WebSocket.
 - **Persistência de Dados:** Configurações de telas e avisos são salvas em arquivos JSON, funcionando como um banco de dados simples.
 
@@ -47,6 +47,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 │   └── logo.png
 ├── uploads/               # Pasta para as imagens dos avisos (criada automaticamente)
 ├── views/                 # Arquivos de template EJS
+├── .env                   # Arquivo de senhas
 ├── avisos.json            # "Banco de dados" para os avisos
 ├── content-manager.js     # Lógica para buscar e processar conteúdo
 ├── db.json                # "Banco de dados" para as telas
@@ -54,6 +55,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 ├── docker-compose.yml     # Orquestra o container para deploy facilitado
 ├── package.json           # Dependências e scripts do projeto
 └── server.js              # Servidor principal (coração da aplicação)
+
 ```
 
 ## Instalação e Execução
@@ -70,7 +72,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
     cd [NOME_DA_PASTA_DO_PROJETO]
     ```
 
-2.  **Crie os arquivos de dados iniciais para evitar erros de volume no Docker.:**
+2.  **Se necessário crie os arquivos de dados iniciais para evitar erros de volume no Docker.:**
     ```bash
     touch db.json avisos.json
     ```
@@ -78,7 +80,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 3.  **Suba o serviço com o Docker Compose:**
     ```bash
     docker-compose up -d
-    docker-compose up --build -d (para atualizar o serviço já em funcionamento, lembre-se de copiar as pastas uploads e arquivos json)
+    docker-compose up --build -d (para atualizar o serviço já em funcionamento, lembre-se de copiar as pastas uploads e arquivos json e .env)
     ```
 
 4.  **Acesse a aplicação:**
@@ -91,7 +93,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 ### Login
 - **Usuário Padrão:** `admin`
 - **Senha Padrão:** `admin`
-*Recomenda-se alterar essas credenciais diretamente no arquivo `server.js` para um ambiente de produção.*
+*Recomenda-se alterar essas credenciais diretamente no arquivo `.env` para um ambiente de produção.*
 
 ### Dashboard
 Após o login, você verá o dashboard principal, que lista todas as telas criadas. A partir daqui, você pode:
@@ -116,12 +118,9 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 
 ## Próximos Passos e Melhorias Futuras
 
-- [ ] Implementar um sistema de autenticação mais robusto e criptografia.
+- [ ] Melhorar organização e comentários do código.
 - [ ] Melhorar Gerenciamento de Dados (race condition)
-- [ ] Otimizar Atualizações de Conteúdo com WebSockets
 - [ ] Permitir a configuração de múltiplas fontes de conteúdo (mais de um feed RSS) por tela.
-- [ ] Criar uma interface para visualizar logs de erros do servidor.
-- [ ] Melhorias no código e UX.
 - [ ] Implementar estratégias de cache inteligentes com Service Worker. (Exige HTTPS)
 - [ ] Implementar HTTPS com Certificado Autoassinado (o certificado tem que ser instalado manualmente em cada dispositivo)
 ---

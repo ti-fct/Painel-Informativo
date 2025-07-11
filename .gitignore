@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # Não copia banco de dados e nem a pasta uploads
-uploads/
-*.json
+#uploads/
+#.json

@@ -1,8 +1,7 @@
-# Etapa 1: Definir a imagem base oficial do Node.js.
-# Usaremos a versão 18-alpine, que é leve e segura.
+# Imagem base oficial do Node.js.
 FROM node:18-alpine
 
-# Define o diretório de trabalho dentro do contêiner.
+# Diretório de trabalho dentro do contêiner.
 WORKDIR /usr/src/app
 
 # Copia os arquivos de dependências primeiro para aproveitar o cache do Docker.
