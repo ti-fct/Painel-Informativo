@@ -115,6 +115,8 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 - **Título e Descrição:** Conteúdo principal do aviso.
 - **Data de Início e Fim:** Período em que o aviso estará ativo e será exibido nas telas configuradas para isso.
 - **Imagem e Link:** Campos opcionais para enriquecer o aviso.
+- **Seletor de Telas** Campo de seleção para quais telas deverão aparecer os avisos.
+
 
 ## Próximos Passos e Melhorias Futuras
 
