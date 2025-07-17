@@ -2,18 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================================
     // 1. INICIALIZAÇÃO DE VARIÁVEIS (A PARTIR DO EJS)
     // =======================================================
-    // A variável 'initialData' é criada pelo EJS e está disponível globalmente.
-    // Agora, usamos essa única fonte de verdade para configurar o script.
-
-    // Variáveis que podem mudar durante a execução
     let content = initialData.content;
     let config = initialData.config;
     let currentIndex = 0;
-
-    // Constantes
     const screenId = initialData.screenId;
 
-    // Variáveis de controle de animação
     let carouselIntervalId = null;
     let progressIntervalId = null;
     let scrollAnimationId = null;
@@ -21,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================================
     // 2. SELETORES DE ELEMENTOS DO DOM
     // =======================================================
+    // ALTERAÇÃO: Selecionamos os novos contêineres
+    const carouselWrapper = document.querySelector('.carousel-wrapper');
+    const emptyStateContainer = document.getElementById('empty-state-container');
+
     const titleEl = document.getElementById('carousel-title');
     const dateEl = document.getElementById('carousel-date');
     const descriptionEl = document.getElementById('carousel-description');
@@ -29,16 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrCodeEl = document.getElementById('qr-code');
     const progressBarEl = document.getElementById('progress-bar');
     const descriptionArea = document.querySelector('.description-scroll-area');
-    // Atualiza o título principal da página
-    //const headerTitleEl = document.querySelector('.main-header h1');
-    //headerTitleEl.textContent = initialData.screenName;
+    const bodyEl = document.body;
 
     // =======================================================
     // 3. INSTÂNCIAS E FUNÇÕES
     // =======================================================
     const qrCodeInstance = new QRCode(qrCodeEl, {
-        width: 150,
-        height: 150,
+        width: 120,
+        height: 120,
         correctLevel: QRCode.CorrectLevel.H
     });
 
@@ -67,18 +62,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDisplay() {
         if (progressIntervalId) clearInterval(progressIntervalId);
         if (scrollAnimationId) cancelAnimationFrame(scrollAnimationId);
-
+        
+        // ALTERAÇÃO: Lógica de tela vazia simplificada
         if (!content || content.length === 0) {
-            titleEl.textContent = 'Nenhum conteúdo para exibir.';
-            dateEl.textContent = '';
-            descriptionEl.innerHTML = 'Verifique as configurações ou a conexão.';
-            imageEl.style.display = 'none';
-            imagePlaceholder.style.display = 'block';
-            imagePlaceholder.textContent = 'Sem conteúdo';
-            qrCodeEl.style.display = 'none';
+            // Mostra a mensagem de tela vazia e esconde o carrossel
+            carouselWrapper.style.display = 'none';
+            emptyStateContainer.style.display = 'flex'; // 'flex' ativa o alinhamento central do CSS
             return;
         }
 
+        // Garante que o estado visual esteja correto se houver conteúdo
+        carouselWrapper.style.display = 'flex'; // 'flex' é o display padrão do wrapper
+        emptyStateContainer.style.display = 'none';
+
+
+        // Lógica para o layout dinâmico
+        if (bodyEl.dataset.layout === 'dynamic') {
+            const itemForLayout = content[currentIndex];
+            bodyEl.classList.remove('layout-a-active', 'layout-b-active');
+
+            if (itemForLayout.tipo === 'noticia') {
+                bodyEl.classList.add('layout-a-active');
+            } else {
+                bodyEl.classList.add('layout-b-active');
+            }
+        }
+        
         const item = content[currentIndex];
         titleEl.textContent = item.titulo;
         dateEl.textContent = item.data;
@@ -152,11 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startCarousel() {
         if (carouselIntervalId) clearInterval(carouselIntervalId);
+        // O updateDisplay agora gerencia o que mostrar (carrossel ou tela vazia)
+        updateDisplay(); 
+        
+        // Só inicia o intervalo se houver conteúdo
         if (content && content.length > 0) {
-            updateDisplay();
             carouselIntervalId = setInterval(nextItem, config.carouselInterval);
-        } else {
-            updateDisplay();
         }
     }
 

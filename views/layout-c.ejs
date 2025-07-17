@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Informativo FCT/UFG</title>
-    <link rel="stylesheet" href="/css/layout-b.css">
+    <link rel="stylesheet" href="/css/layout-c.css">
 </head>
 
-<body data-screen-id="<%= screenId %>">
+<!-- O atributo 'data-layout' informa ao JS para ativar a lógica dinâmica -->
+<body data-screen-id="<%= screenId %>" data-layout="dynamic">
     <header class="main-header">
         <h1>Painel Informativo FCT/UFG</h1>
     </header>
@@ -18,10 +19,12 @@
             <h2>Nenhum conteúdo configurado para esta tela.</h2>
         </div>
         <div class="carousel-wrapper">
+            <!-- A estrutura do layout-a é genérica e contém todos os elementos necessários.
+                 O CSS irá mostrar/esconder o que for preciso para cada modo (A ou B). -->
             <div class="carousel-item-content">
                 <div class="image-container">
-                    <img id="carousel-image" src="" alt="Imagem da notícia">
-                    <div class="image-placeholder">Carregando imagem...</div>
+                    <img id="carousel-image" src="" alt="Imagem do conteúdo">
+                    <div class="image-placeholder">Carregando...</div>
                 </div>
                 <div class="text-container">
                     <h2 id="carousel-title">Carregando conteúdo...</h2>

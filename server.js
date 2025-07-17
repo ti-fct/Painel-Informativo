@@ -73,8 +73,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.urlencoded({ extended: true }));
+
+// Validação do SESSION_SECRET ao iniciar
+if (!process.env.SESSION_SECRET) {
+    console.warn("AVISO: A variável de ambiente SESSION_SECRET não está definida. Usando um valor padrão inseguro.");
+    console.warn("Para produção, copie .env.example para .env e defina um SESSION_SECRET único e seguro.");
+}
+
 app.use(session({
-    secret: 'seu-segredo-super-secreto-aqui-troque-depois',
+    // ALTERAÇÃO: Usa a variável de ambiente ou um fallback com aviso.
+    secret: process.env.SESSION_SECRET || 'insecure-default-secret-for-dev',
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 24 * 60 * 60 * 1000 }
@@ -240,6 +248,7 @@ app.get('/display/:id', async (req, res) => {
 
         // 2. Passamos esse objeto inteiro para a view.
         //    O EJS terá acesso a `screenId`, `screenName`, `content` e `config`.
+        //    A renderização usará 'layout-a', 'layout-b' ou o novo 'layout-c'
         res.render(screen.layout, initialData);
 
     } catch (error) {
@@ -301,22 +310,26 @@ app.get('/api/server-info', requireAuth, (req, res) => {
 app.get('/admin/screen/new', requireAuth, (req, res) => {
     res.render('screen-form', { pageTitle: 'Adicionar Nova Tela', formAction: '/admin/screen/new', screen: null });
 });
+
+// ALTERAÇÃO: Rota de criação de tela
 app.post('/admin/screen/new', requireAuth, async (req, res) => {
     try {
-        // Captura os novos campos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
+        // 1. Recebe o valor em segundos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss } = req.body;
+
+        // 2. Converte para milissegundos antes de salvar
+        const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
 
         const newScreen = {
             id: await generateNextScreenId(),
             name,
             layout,
             config: {
-                // Se o RSS não for incluído, salva uma string vazia ou o valor fornecido
                 rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
                 newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
-                carouselInterval: parseInt(carouselInterval, 10),
+                carouselInterval: carouselInterval, // 3. Salva o valor em milissegundos
                 includeAvisos: includeAvisos === 'true',
-                includeRss: includeRss === 'true' // Salva o estado do toggle
+                includeRss: includeRss === 'true'
             }
         };
         const db = await readDB();
@@ -328,38 +341,37 @@ app.post('/admin/screen/new', requireAuth, async (req, res) => {
         res.status(500).send('Erro ao salvar a tela.');
     }
 });
+
 app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     const db = await readDB();
     const screen = db.screens.find(s => s.id === req.params.id);
     if (!screen) return res.status(404).send('Tela não encontrada.');
     res.render('screen-form', { pageTitle: 'Editar Tela', formAction: `/admin/screen/edit/${screen.id}`, screen: screen });
 });
+
+// ALTERAÇÃO: Rota de edição de tela
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
-        const db = await readDB();
+        // 1. Recebe o valor em segundos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss } = req.body;
+        
+        // 2. Converte para milissegundos antes de salvar
+        const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
 
+        const db = await readDB();
         const screenIndex = db.screens.findIndex(s => s.id === req.params.id);
         if (screenIndex === -1) return res.status(404).send('Tela não encontrada.');
 
-        // Pega a configuração existente para usar como base
         const existingConfig = db.screens[screenIndex].config;
 
-        // Atualiza os dados da tela
         db.screens[screenIndex] = {
             id: req.params.id,
             name,
             layout,
             config: {
-                rssFeedUrl: (includeRss === 'true')
-                    ? rssFeedUrl // Se RSS estiver LIGADO, usa o novo valor do formulário
-                    : existingConfig.rssFeedUrl, // Se estiver DESLIGADO, mantém o valor antigo
-
-                newsQuantity: (includeRss === 'true')
-                    ? parseInt(newsQuantity, 10) // Se RSS estiver LIGADO, usa o novo valor
-                    : existingConfig.newsQuantity, // Se estiver DESLIGADO, mantém o valor antigo
-
-                carouselInterval: parseInt(carouselInterval, 10),
+                rssFeedUrl: (includeRss === 'true') ? rssFeedUrl : existingConfig.rssFeedUrl,
+                newsQuantity: (includeRss === 'true') ? parseInt(newsQuantity, 10) : existingConfig.newsQuantity,
+                carouselInterval: carouselInterval, // 3. Salva o valor em milissegundos
                 includeAvisos: includeAvisos === 'true',
                 includeRss: includeRss === 'true'
             }
@@ -372,6 +384,8 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
         res.status(500).send('Erro ao atualizar a tela.');
     }
 });
+
+
 app.post('/admin/screen/delete/:id', requireAuth, async (req, res) => {
     const db = await readDB();
     db.screens = db.screens.filter(s => s.id !== req.params.id);

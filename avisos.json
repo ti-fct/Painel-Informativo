@@ -2,23 +2,19 @@
   {
     "titulo": "Aviso Exemplo 1",
     "descricao": "Descrição do aviso 1",
-    "data_inicio": "2025-07-10 08:00",
-    "data_fim": "2025-07-11 08:00",
+    "data_inicio": "2025-07-16 08:00",
+    "data_fim": "2025-07-24 08:00",
     "link": "",
     "url_imagem": "http://localhost:3000/uploads/1752201854984-aviso1.jpg",
-    "targetScreens": [
-      "001"
-    ]
+    "targetScreens": []
   },
   {
     "titulo": "Aviso Exemplo 2",
     "descricao": "Descrição do aviso 2",
-    "data_inicio": "2025-07-10 08:00",
-    "data_fim": "2025-07-11 08:00",
+    "data_inicio": "2025-07-16 08:00",
+    "data_fim": "2025-07-19 08:00",
     "link": "",
     "url_imagem": "http://localhost:3000/uploads/1752201861595-aviso2.jpg",
-    "targetScreens": [
-      "001"
-    ]
+    "targetScreens": []
   }
 ]

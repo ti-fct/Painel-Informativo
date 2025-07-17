@@ -146,8 +146,9 @@ html {
 }
 
 #qr-code {
-    width: 150px;
-    height: 150px;
+    /* ALTERAÇÃO: Tamanho do QRCode ajustado */
+    width: 120px;
+    height: 120px;
 }
 
 /* --- Barra de Progresso --- */
@@ -177,4 +178,24 @@ html {
     #carousel-description {
         font-size: 18px;
     }
+}
+
+/* --- Estilo para Tela Vazia --- */
+#empty-state-container {
+    display: flex; /* Usado pelo JS para mostrar o elemento */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#empty-state-container h2 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #6c757d;
+    padding: 2rem;
+    text-align: center;
 }
