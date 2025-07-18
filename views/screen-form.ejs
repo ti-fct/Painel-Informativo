@@ -2,7 +2,7 @@
 
     <form action="<%= formAction %>" method="POST" class="form-card">
         <div class="form-group">
-            <label for="name">Fontes de Conteúdo</label>
+            <label for="name">Nome da Tela</label>
             <input type="text" id="name" name="name" required placeholder="Ex: Tela da Biblioteca"
                 value="<%= screen ? screen.name : '' %>">
         </div>
@@ -65,24 +65,7 @@
         <fieldset>
             <legend>Configurações de Exibição</legend>
             <div class="form-group">
-                <label for="layout">Layout</label>
-                <select id="layout" name="layout">
-                    <option value="layout-a" <%=(screen && screen.layout==='layout-a' ) ? 'selected' : '' %>>
-                        Layout A - Noticias (Imagem + Texto)
-                    </option>
-                    <option value="layout-b" <%=(screen && screen.layout==='layout-b' ) ? 'selected' : '' %>>
-                        Layout B - Avisos (Imagem Somente)
-                    </option>
-                    <option value="layout-c" <%=(screen && screen.layout==='layout-c' ) ? 'selected' : '' %>>
-                        Layout C - Dinâmico (Layouts A+B+D)
-                    </option>
-                    <option value="layout-d" <%=(screen && screen.layout==='layout-d' ) ? 'selected' : '' %>>
-                        Layout D - (Agenda / Calendário)
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="carouselIntervalSeconds">Intervalo do Carrossel (segundos)</label>
+                <label for="carouselIntervalSeconds">Intervalo por Item (segundos)</label>
                 <input type="number" id="carouselIntervalSeconds" name="carouselIntervalSeconds" min="5" step="1"
                     required value="<%= screen ? (screen.config.carouselInterval / 1000) : '20' %>">
             </div>
@@ -117,5 +100,4 @@
 
     <%- include('_admin-footer') %>
         </body>
-
         </html>

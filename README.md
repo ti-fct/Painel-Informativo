@@ -12,11 +12,8 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 - **Gerenciamento de Telas:** Crie, edite e exclua múltiplas telas de exibição.
 - **Configuração por Tela:** Cada tela pode ter suas próprias fontes de conteúdo e configurações.
 - **Gerenciamento de Avisos:** Um CRUD completo para criar avisos com título, descrição, período de validade e imagem. Avisos são exibidos automaticamente durante seu período de vigência.
-- **Layouts Flexíveis:**
-  - **Layout A:** Exibição completa com imagem, título, data, descrição e QR Code para o link da notícia.
-  - **Layout B:** Exibição só de imagens, ideal para avisos.
-  - **Layout C:** Exibição dinâmica (todos os layouts juntos)
-  - **Layout D:** Exibição de calendário.
+- **Layout Dinânico:**
+  - O layout se ajusta de acordo com o conteúdo exibido.
 - **Atualização em Tempo Real:** Administradores podem forçar a atualização de todas as telas ativas com um único clique, graças à tecnologia WebSocket.
 - **Persistência de Dados:** Configurações de telas e avisos são salvas em arquivos JSON, funcionando como um banco de dados simples.
 
@@ -78,13 +75,16 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
     touch db.json avisos.json
     ```
 
-3.  **Suba o serviço com o Docker Compose:**
+4.  **Configure o arquivo .env:**
+Arquivo .env contem os parâmetros para o funcionamento do painel, copie o arquivo .env.exemplo e o configure de acordo com os comentários
+
+5.  **Suba o serviço com o Docker Compose:**
     ```bash
     docker-compose up -d
     docker-compose up --build -d (para atualizar o serviço já em funcionamento, lembre-se de copiar as pastas uploads e arquivos json e .env)
     ```
 
-4.  **Acesse a aplicação:**
+6.  **Acesse a aplicação:**
     - O servidor estará rodando em `http://localhost:3000` (ou no seu IP). 
     - **Painel de Administração:** Acesse `http://localhost:3000/admin/login`
     - **Telas de Exibição:** Serão acessíveis através de URLs como `http://localhost:3000/display/[ID_DA_TELA]`.
@@ -107,7 +107,6 @@ Após o login, você verá o dashboard principal, que lista todas as telas criad
 - **Fontes de Conteúdo:**
   - **Selecionar suas fontes:** Escolha e marque a fonte que deseja exibir.
 - **Configurações de Exibição:**
-  - **Layout:** Escolha o layout visual para a tela.
   - **Intervalo do Carrossel:** Tempo em segundos que cada slide ficará visível.
 
 ### Gerenciando Avisos
@@ -120,7 +119,7 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 
 ## Próximos Passos e Melhorias Futuras
 
-- [ ] Melhorar organização e comentários do código.
+- [X] Melhorar organização e comentários do código.
 - [ ] Melhorar Gerenciamento de Dados (race condition)
 - [ ] Permitir a configuração de múltiplas fontes de conteúdo (mais de um feed RSS) por tela.
 - [ ] Implementar estratégias de cache inteligentes com Service Worker. (Exige HTTPS)

@@ -5,11 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Informativo FCT/UFG</title>
-    <link rel="stylesheet" href="/css/layout-c.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
-<!-- O atributo 'data-layout' informa ao JS para ativar a lógica dinâmica -->
-<body data-screen-id="<%= screenId %>" data-layout="dynamic">
+<body data-screen-id="<%= screenId %>">
     <header class="main-header">
         <h1>Painel Informativo FCT/UFG</h1>
     </header>
@@ -18,9 +20,8 @@
         <div id="empty-state-container" style="display: none;">
             <h2>Nenhum conteúdo configurado para esta tela.</h2>
         </div>
+
         <div class="carousel-wrapper">
-            <!-- A estrutura do layout-a é genérica e contém todos os elementos necessários.
-                 O CSS irá mostrar/esconder o que for preciso para cada modo. -->
             <div class="carousel-item-content">
                 <div class="image-container">
                     <img id="carousel-image" src="" alt="Imagem do conteúdo">
@@ -37,19 +38,40 @@
                     </div>
                 </div>
             </div>
-
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" id="progress-bar"></div>
             </div>
         </div>
+
+        <div class="calendar-wrapper">
+            <header class="calendar-header">
+                <h2>Próximos Eventos</h2>
+                <div class="clock" id="clock">--:--:--</div>
+            </header>
+            
+            <div class="events-list-wrapper">
+                <div class="events-list-header">
+                    <div class="col-date">Data</div>
+                    <div class="col-summary">Evento</div>
+                </div>
+                <div id="events-list" class="events-list-body">
+                </div>
+            </div>
+
+            <footer class="calendar-footer">
+                Atualizado em: <span id="last-updated">--:--:--</span>
+            </footer>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="calendar-progress-bar"></div>
+            </div>
+        </div>
     </main>
 
-    <!-- Passando dados do servidor para o JavaScript do cliente -->
     <script>
-    const initialData = <%- JSON.stringify({ screenId, screenName, content, config }) %>;
+    const initialData = <%- JSON.stringify({ screenId, screenName, content, config, calendarEvents }) %>;
     </script>
 
-    <!-- Bibliotecas e nosso script principal -->
     <script src="/js/qrcode.min.js"></script>
     <script src="/js/display.js"></script>
 </body>

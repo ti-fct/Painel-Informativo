@@ -238,13 +238,9 @@ app.get('/display/:id', async (req, res) => {
         const screen = db.screens.find(s => s.id === req.params.id);
         if (!screen) return res.status(404).send('Tela não encontrada.');
 
-        // 1. O contentManager retorna um objeto completo com todas as informações.
         const initialData = await contentManager.fetchContent(screen);
-
-        // 2. Passamos esse objeto inteiro para a view.
-        //    O EJS terá acesso a `screenId`, `screenName`, `content` e `config`.
-        //    A renderização usará um dos layouts
-        res.render(screen.layout, initialData);
+        
+        res.render('layout', initialData);
 
     } catch (error) {
         console.error("Erro ao carregar tela de exibição:", error);
@@ -273,11 +269,9 @@ app.get('/', (req, res) => res.redirect('/admin/login'));
 app.get('/admin/login', (req, res) => res.render('login', { error: null }));
 
 app.post('/admin/login', (req, res) => {
-    // Lê as credenciais das variáveis de ambiente
     const adminUser = process.env.ADMIN_USERNAME || 'admin';
-    const adminPass = process.env.ADMIN_PASSWORD || 'admin'; // 'admin' como fallback de segurança
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin'; 
 
-    // ALTERADO: Comparação com as variáveis de ambienteNPM
     if (req.body.username === adminUser && req.body.password === adminPass) {
         req.session.isLoggedIn = true;
         res.redirect('/admin/dashboard');
@@ -296,8 +290,8 @@ app.get('/admin/logout', (req, res) => {
 // Rota para informações do servidor
 app.get('/api/server-info', requireAuth, (req, res) => {
     res.json({
-        serverTime: new Date().toISOString(), // Envia a hora em formato padrão ISO
-        updateInterval: 1800 // Intervalo de 30 minutos em segundos
+        serverTime: new Date().toISOString(), 
+        updateInterval: 1800 
     });
 });
 
@@ -308,15 +302,12 @@ app.get('/admin/screen/new', requireAuth, (req, res) => {
 
 app.post('/admin/screen/new', requireAuth, async (req, res) => {
     try {
-        // Captura os campos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
-
+        const { name, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
         const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
-
+        
         const newScreen = {
             id: await generateNextScreenId(),
             name,
-            layout,
             config: {
                 rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
                 newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
@@ -346,11 +337,8 @@ app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
 
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        // // Captura alteração dos campos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
-
+        const { name, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
         const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
-
         const db = await readDB();
         const screenIndex = db.screens.findIndex(s => s.id === req.params.id);
         if (screenIndex === -1) return res.status(404).send('Tela não encontrada.');
@@ -360,7 +348,6 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
         db.screens[screenIndex] = {
             id: req.params.id,
             name,
-            layout,
             config: {
                 rssFeedUrl: (includeRss === 'true') ? rssFeedUrl : existingConfig.rssFeedUrl,
                 newsQuantity: (includeRss === 'true') ? parseInt(newsQuantity, 10) : existingConfig.newsQuantity,
@@ -397,11 +384,10 @@ app.post('/admin/refresh-all', requireAuth, (req, res) => {
 app.get('/admin/avisos', requireAuth, async (req, res) => {
     try {
         const db = await readDB();
-        // Passa a lista de telas para que o formulário possa renderizar as opções
         res.render('avisos', { screens: db.screens || [] });
     } catch (error) {
         console.error("Erro ao carregar página de avisos:", error);
-        res.status(500).render('avisos', { screens: [] }); // Renderiza a página mesmo com erro
+        res.status(500).render('avisos', { screens: [] }); 
     }
 });
 
@@ -419,15 +405,12 @@ app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, re
     if (!titulo || !descricao) {
         return res.status(400).json({ success: false, message: 'Título e descrição são obrigatórios.' });
     }
-
-    // Garante que 'targetScreens' seja sempre um array
     const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
-
     const avisos = await readAvisos();
     const newAviso = {
         titulo, descricao, data_inicio, data_fim, link: link || '',
         url_imagem: req.file ? getFullImageUrl(req, req.file.filename) : '',
-        targetScreens: screensArray // Salva o array de telas
+        targetScreens: screensArray
     };
     avisos.push(newAviso);
     await writeAvisos(avisos);
@@ -440,14 +423,10 @@ app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (r
     const avisos = await readAvisos();
     const index = parseInt(req.params.index);
     if (index < 0 || index >= avisos.length) return res.status(404).json({ success: false, message: 'Aviso não encontrado.' });
-
-    // Garante que 'targetScreens' seja sempre um array
     const { targetScreens, ...otherBodyData } = req.body;
     const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
-
     const updatedAviso = { ...avisos[index], ...otherBodyData, targetScreens: screensArray };
     delete updatedAviso.aviso_index;
-
     if (req.file) {
         updatedAviso.url_imagem = getFullImageUrl(req, req.file.filename);
     }
@@ -460,43 +439,28 @@ app.delete('/api/avisos/:index', requireAuth, async (req, res) => {
     try {
         const avisos = await readAvisos();
         const index = parseInt(req.params.index, 10);
-
-        // Validação: garante que o índice é um número válido e está dentro dos limites do array
         if (isNaN(index) || index < 0 || index >= avisos.length) {
             return res.status(404).json({ success: false, message: 'Aviso não encontrado ou índice inválido.' });
         }
-
-        // Remove o aviso do array usando splice.
-        // O splice retorna um array com os itens removidos, então pegamos o primeiro (e único) item.
         const [deletedAviso] = avisos.splice(index, 1);
-
-        // Lógica para remover a imagem associada, se houver
         if (deletedAviso && deletedAviso.url_imagem && deletedAviso.url_imagem.includes('/uploads/')) {
             try {
-                // Extrai o nome do arquivo da URL completa
                 const imageFilename = path.basename(new URL(deletedAviso.url_imagem).pathname);
                 const imagePath = path.join(UPLOADS_DIR, imageFilename);
 
-                // Verifica se o arquivo existe antes de tentar apagar
-                if (fs.existsSync(imagePath)) {
-                    await fs.unlink(imagePath); // Usa a versão assíncrona
+                // Módulo fs/promises não tem 'existsSync', usamos o 'fs' normal para isso ou um try/catch com 'access'
+                const fsSync = require('fs');
+                if (fsSync.existsSync(imagePath)) {
+                    await fs.unlink(imagePath);
                     console.log(`Imagem removida: ${imagePath}`);
                 }
             } catch (e) {
-                // Loga o erro, mas não impede a resposta de sucesso, pois o aviso foi removido do JSON.
                 console.error("Não foi possível remover o arquivo de imagem associado:", e.message);
             }
         }
-
-        // Salva o array modificado de volta no arquivo JSON
         await writeAvisos(avisos);
-
-        // Dispara o refresh para todas as telas ativas
         broadcastRefresh();
-
-        // Responde com sucesso
         res.json({ success: true, message: 'Aviso removido com sucesso!' });
-
     } catch (error) {
         console.error('Erro ao excluir aviso:', error);
         res.status(500).json({ success: false, message: 'Erro interno no servidor ao tentar excluir o aviso.' });

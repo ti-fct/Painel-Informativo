@@ -31,10 +31,7 @@
             font-weight: 700;
             color: var(--color-primary);
         }
-
-        /* ------------------------------------------- */
-        /* ALTERAÇÃO: Estilos para os detalhes da tela */
-        /* ------------------------------------------- */
+        
         .screen-details {
             margin-top: 1rem;
             font-size: 0.9rem;
@@ -42,23 +39,21 @@
         .screen-details p {
             margin: 0.4rem 0;
             color: var(--color-body-text);
-            display: flex; /* Para alinhar o label e o conteúdo */
-            flex-wrap: wrap; /* Permite que o conteúdo quebre a linha em telas pequenas */
-
+            display: flex; 
+            flex-wrap: wrap; 
         }
         .screen-details strong {
             color: var(--color-dark);
             margin-right: 0.5rem;
-            flex-shrink: 0; /* Impede que o label encolha */
+            flex-shrink: 0; 
         }
-        /* Estilo para a URL longa do RSS */
+        
         .rss-url-value {
             word-break: break-all;
             color: #6c757d;
         }
     </style>
 
-    <!-- NOVO: Barra de informações -->
     <div class="info-bar">
         <div class="info-item">
             <span class="label">Telas Ativas</span>
@@ -95,23 +90,14 @@
                                 <%= screen.name %> <small style="font-weight: 400; color: #6c757d;">(ID: <%= screen.id
                                             %>)</small>
                             </h3>
-<div class="screen-details">
+                            <div class="screen-details">
                                 <%
-                                    // Mapeia o ID do layout para um texto mais amigável
-                                    let layoutText = 'Desconhecido';
-                                    if (screen.layout === 'layout-a') layoutText = 'A (Imagem + Texto)';
-                                    if (screen.layout === 'layout-b') layoutText = 'B (Imagem Somente)';
-                                    if (screen.layout === 'layout-c') layoutText = 'C (Dinâmico A+B+D)';
-                                    if (screen.layout === 'layout-d') layoutText = 'D (Agenda/Calendário)';
-                                
-                                    // Cria uma lista de fontes de conteúdo ativas
                                     let sources = [];
                                     if (screen.config.includeAvisos) sources.push('Avisos');
                                     if (screen.config.includeRss) sources.push(`RSS (${screen.config.newsQuantity} notícias)`);
                                     if (screen.config.includeCalendar) sources.push('Calendário');
                                     if (sources.length === 0) sources.push('Nenhuma');
                                 %>
-                                <p><strong>Layout:</strong> <span><%= layoutText %></span></p>
                                 <p><strong>Intervalo:</strong> <span><%= screen.config.carouselInterval / 1000 %>s</span></p>
                                 <p><strong>Fontes:</strong> <span><%= sources.join(', ') %></span></p>
 
@@ -122,10 +108,7 @@
                                 <% if (screen.config.includeCalendar && screen.config.calendarId) { %>
                                     <p><strong>ID da Agenda:</strong> <span class="calendar-id-value"> <%= screen.config.calendarId.length > 20 ? screen.config.calendarId.substring(0, 20) + '...' : screen.config.calendarId %></span></p>
                                 <% } %>
-
                             </div>
-
-
                         </div>
                         <div class="screen-actions">
                             <a href="/display/<%= screen.id %>" target="_blank" class="btn btn-secondary">Visualizar</a>
@@ -137,12 +120,12 @@
                         </div>
                     </div>
                     <% }); %>
-                        <% } %>
+                <% } %>
     </section>
 
     <%- include('_admin-footer') %>
 
-        <script src="/js/dashboard.js"></script>
-        </body>
+    <script src="/js/dashboard.js"></script>
+</body>
 
-        </html>
+</html>

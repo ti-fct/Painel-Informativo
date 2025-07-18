@@ -21,7 +21,7 @@ async function _carregarEventosCalendario(screenConfig) {
     const calendarId = encodeURIComponent(screenConfig.calendarId);
     const apiKey = process.env.GOOGLE_CALENDAR_API_KEY;
     const timeMin = new Date().toISOString();
-    const timeMax = addDays(new Date(), 60).toISOString(); // Eventos dos próximos 60 dias
+    const timeMax = addDays(new Date(), 60).toISOString();
 
     const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
 
@@ -34,67 +34,52 @@ async function _carregarEventosCalendario(screenConfig) {
         return events.map(event => ({
             summary: event.summary,
             description: event.description || '',
-            start: event.start.dateTime || event.start.date, // Trata eventos do dia todo
+            start: event.start.dateTime || event.start.date,
             end: event.end.dateTime || event.end.date,
-            tipo: 'evento' // Tipo para identificação no futuro
+            tipo: 'evento'
         }));
 
     } catch (error) {
         console.error(`Erro ao buscar eventos do Google Calendar (ID: ${screenConfig.calendarId}):`, error.response ? error.response.data : error.message);
-        return []; // Retorna array vazio em caso de erro
+        return [];
     }
 }
 
-// A função agora recebe o ID da tela que está pedindo os avisos
 async function _carregarAvisosAtivos(screenId) {
     try {
         const data = await fs.readFile(AVISOS_DB_PATH, 'utf-8');
         const avisos = JSON.parse(data);
         const agora = new Date();
 
-        const avisosAtivos = avisos
+        return avisos
             .filter(aviso => {
-                // 1. Filtro por data (lógica existente)
                 if (!aviso.data_inicio || !aviso.data_fim) return false;
                 const dataInicio = new Date(aviso.data_inicio.replace(' ', 'T'));
                 const dataFim = new Date(aviso.data_fim.replace(' ', 'T'));
-                const isDateValid = !isNaN(dataInicio) && !isNaN(dataFim) && dataInicio <= agora && agora <= dataFim;
-                if (!isDateValid) return false;
+                if (isNaN(dataInicio) || isNaN(dataFim) || !(dataInicio <= agora && agora <= dataFim)) return false;
                 
-                // 2. Novo filtro por tela de destino
                 const isGlobal = !aviso.targetScreens || aviso.targetScreens.length === 0;
                 const isTargeted = Array.isArray(aviso.targetScreens) && aviso.targetScreens.includes(screenId);
-
                 return isGlobal || isTargeted;
             })
-            .map(aviso => {
-                const dataFimFormatada = format(new Date(aviso.data_fim.replace(' ', 'T')), "dd/MM/yyyy 'às' HH:mm");
-                return {
-                    titulo: aviso.titulo,
-                    descricao: aviso.descricao,
-                    link: aviso.link || '',
-                    url_imagem: aviso.url_imagem,
-                    data: `Aviso válido até ${dataFimFormatada}`,
-                    tipo: 'aviso'
-                };
-            });
-        return avisosAtivos;
+            .map(aviso => ({
+                titulo: aviso.titulo,
+                descricao: aviso.descricao,
+                link: aviso.link || '',
+                url_imagem: aviso.url_imagem,
+                data: `Aviso válido até ${format(new Date(aviso.data_fim.replace(' ', 'T')), "dd/MM/yyyy 'às' HH:mm")}`,
+                tipo: 'aviso'
+            }));
     } catch (error) {
         if (error.code === 'ENOENT') {
             console.warn("Arquivo 'avisos.json' não encontrado. Nenhum aviso será carregado.");
-            return [];
+        } else {
+            console.error("Erro ao carregar avisos do arquivo JSON:", error);
         }
-        console.error("Erro ao carregar avisos do arquivo JSON:", error);
         return [];
     }
 }
 
-/**
- * Busca e processa as notícias de um feed RSS, com base na configuração da tela.
- * Inclui lógica aprimorada para corrigir URLs de imagem malformadas.
- * @param {object} screenConfig - A configuração da tela (rssFeedUrl, newsQuantity).
- * @returns {Promise<Array>} Uma promessa que resolve para um array de objetos de notícia.
- */
 async function _carregarNoticiasFeed(screenConfig) {
     try {
         const feedUrl = screenConfig.rssFeedUrl;
@@ -115,7 +100,6 @@ async function _carregarNoticiasFeed(screenConfig) {
                     const startIndex = urlLower.indexOf("http", 1);
                     if (startIndex !== -1) {
                         url_imagem = url_imagem.substring(startIndex);
-                        console.log(`URL da imagem corrigida para: ${url_imagem}`);
                     }
                 }
             }
@@ -125,8 +109,7 @@ async function _carregarNoticiasFeed(screenConfig) {
             const hint_message = "<br><br><i>(Leia a notícia completa no QR Code)</i>";
             if (descricao.length > LIMITE_DESCRICAO_CARACTERES) {
                 let posicao_corte = descricao.lastIndexOf(' ', LIMITE_DESCRICAO_CARACTERES);
-                if (posicao_corte === -1) posicao_corte = LIMITE_DESCRICAO_CARACTERES;
-                descricao = descricao.substring(0, posicao_corte) + "..." + hint_message;
+                descricao = descricao.substring(0, posicao_corte > 0 ? posicao_corte : LIMITE_DESCRICAO_CARACTERES) + "..." + hint_message;
             }
 
             let data_formatada = "Data não disponível";
@@ -156,36 +139,32 @@ async function fetchContent(screen) {
     const screenConfig = screen.config || {};
     console.log(`Iniciando atualização de conteúdo para: ${screen.name || 'Tela sem nome'} (ID: ${screen.id})`);
 
-    const promises = [];
-
-    if (screenConfig.includeAvisos !== false) {
-        promises.push(_carregarAvisosAtivos(screen.id));
-    } else {
-        promises.push(Promise.resolve([]));
-    }
-
-    if (screenConfig.includeRss !== false) {
-        promises.push(_carregarNoticiasFeed(screenConfig));
-    } else {
-        promises.push(Promise.resolve([]));
-    }
-    
-    if (screenConfig.includeCalendar !== false) {
-        promises.push(_carregarEventosCalendario(screenConfig));
-    } else {
-        promises.push(Promise.resolve([]));
-    }
+    const promises = [
+        screenConfig.includeAvisos ? _carregarAvisosAtivos(screen.id) : Promise.resolve([]),
+        screenConfig.includeRss ? _carregarNoticiasFeed(screenConfig) : Promise.resolve([]),
+        screenConfig.includeCalendar ? _carregarEventosCalendario(screenConfig) : Promise.resolve([])
+    ];
 
     const [avisos, noticias, eventos] = await Promise.all(promises);
-    const content = [...avisos, ...noticias]; 
 
-    console.log(`Conteúdo carregado: ${avisos.length} aviso(s), ${noticias.length} notícia(s), ${eventos.length} evento(s).`);
+    let content = [...avisos, ...noticias]; 
 
+    if (eventos.length > 0) {
+        content.push({
+            tipo: 'calendario',
+            titulo: 'Próximos Eventos',
+            eventos: eventos
+        });
+    }
+
+    console.log(`Conteúdo final montado: ${avisos.length} aviso(s), ${noticias.length} notícia(s), ${eventos.length > 0 ? 1 : 0} slide(s) de calendário.`);
+    
+    // A função agora retorna sempre a mesma estrutura de dados, que é o que o layout dinâmico espera.
     return {
         screenId: screen.id,
         screenName: screen.name,
         content: content,
-        calendarEvents: eventos, // Passa os eventos separadamente para o layout
+        calendarEvents: eventos,
         config: {
             carouselInterval: screenConfig.carouselInterval,
             contentUpdateInterval: 1800 * 1000,
