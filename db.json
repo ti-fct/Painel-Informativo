@@ -3,13 +3,15 @@
     {
       "id": "001",
       "name": "Tela Exemplo 1",
-      "layout": "layout-a",
+      "layout": "layout-c",
       "config": {
         "rssFeedUrl": "https://fct.ufg.br/feed",
-        "newsQuantity": 5,
-        "carouselInterval": 20000,
+        "newsQuantity": 2,
+        "carouselInterval": 7000,
         "includeAvisos": true,
-        "includeRss": true
+        "includeRss": true,
+        "includeCalendar": false,
+        "calendarId": "c_851e8fcd8b81aa4d25fe7044895c1fa3bd8422912a043548c0291dd9a1b28e3f@group.calendar.google.com"
       }
     },
     {

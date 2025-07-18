@@ -1,13 +1,49 @@
 const axios = require('axios');
 const RssParser = require('rss-parser');
 const cheerio = require('cheerio');
-const { format } = require('date-fns');
+const { format, addDays } = require('date-fns');
 const fs = require('fs').promises;
 const path = require('path');
 
 const AVISOS_DB_PATH = path.join(__dirname, 'avisos.json');
 const parser = new RssParser();
 const LIMITE_DESCRICAO_CARACTERES = 1200;
+
+async function _carregarEventosCalendario(screenConfig) {
+    if (!screenConfig.includeCalendar || !screenConfig.calendarId) {
+        return [];
+    }
+    if (!process.env.GOOGLE_CALENDAR_API_KEY) {
+        console.error("A variável de ambiente GOOGLE_CALENDAR_API_KEY não está definida. Não é possível buscar eventos.");
+        return [];
+    }
+
+    const calendarId = encodeURIComponent(screenConfig.calendarId);
+    const apiKey = process.env.GOOGLE_CALENDAR_API_KEY;
+    const timeMin = new Date().toISOString();
+    const timeMax = addDays(new Date(), 60).toISOString(); // Eventos dos próximos 60 dias
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+
+    try {
+        const response = await axios.get(url);
+        const events = response.data.items || [];
+        
+        console.log(`Buscados ${events.length} eventos do calendário: ${screenConfig.calendarId}`);
+
+        return events.map(event => ({
+            summary: event.summary,
+            description: event.description || '',
+            start: event.start.dateTime || event.start.date, // Trata eventos do dia todo
+            end: event.end.dateTime || event.end.date,
+            tipo: 'evento' // Tipo para identificação no futuro
+        }));
+
+    } catch (error) {
+        console.error(`Erro ao buscar eventos do Google Calendar (ID: ${screenConfig.calendarId}):`, error.response ? error.response.data : error.message);
+        return []; // Retorna array vazio em caso de erro
+    }
+}
 
 // A função agora recebe o ID da tela que está pedindo os avisos
 async function _carregarAvisosAtivos(screenId) {
@@ -60,7 +96,6 @@ async function _carregarAvisosAtivos(screenId) {
  * @returns {Promise<Array>} Uma promessa que resolve para um array de objetos de notícia.
  */
 async function _carregarNoticiasFeed(screenConfig) {
-    // ... (nenhuma mudança nesta função)
     try {
         const feedUrl = screenConfig.rssFeedUrl;
         if (!feedUrl) return [];
@@ -117,42 +152,40 @@ async function _carregarNoticiasFeed(screenConfig) {
     }
 }
 
-async function fetchContent(screen) { // Recebe o objeto screen inteiro
+async function fetchContent(screen) {
     const screenConfig = screen.config || {};
     console.log(`Iniciando atualização de conteúdo para: ${screen.name || 'Tela sem nome'} (ID: ${screen.id})`);
 
     const promises = [];
 
-    // Adiciona a busca de avisos apenas se a config permitir.
     if (screenConfig.includeAvisos !== false) {
-        // Passa o ID da tela para a função
         promises.push(_carregarAvisosAtivos(screen.id));
     } else {
-        promises.push(Promise.resolve([])); // Retorna um array vazio se não for para incluir
-        console.log('Avisos globais ignorados para esta tela, conforme configuração.');
+        promises.push(Promise.resolve([]));
     }
 
-    // Adiciona a busca de notícias
     if (screenConfig.includeRss !== false) {
         promises.push(_carregarNoticiasFeed(screenConfig));
     } else {
-        promises.push(Promise.resolve([])); // Adiciona um array vazio se não for para incluir RSS
-        console.log('Feed RSS ignorado para esta tela, conforme configuração.');
+        promises.push(Promise.resolve([]));
     }
-
-    const [avisos, noticias] = await Promise.all(promises);
-    const content = [...avisos, ...noticias];
-
-    if (!content.length) {
-        console.warn("Nenhum conteúdo disponível.");
+    
+    if (screenConfig.includeCalendar !== false) {
+        promises.push(_carregarEventosCalendario(screenConfig));
     } else {
-        console.log(`Conteúdo carregado: ${avisos.length} aviso(s), ${noticias.length} notícia(s).`);
+        promises.push(Promise.resolve([]));
     }
+
+    const [avisos, noticias, eventos] = await Promise.all(promises);
+    const content = [...avisos, ...noticias]; 
+
+    console.log(`Conteúdo carregado: ${avisos.length} aviso(s), ${noticias.length} notícia(s), ${eventos.length} evento(s).`);
 
     return {
         screenId: screen.id,
         screenName: screen.name,
         content: content,
+        calendarEvents: eventos, // Passa os eventos separadamente para o layout
         config: {
             carouselInterval: screenConfig.carouselInterval,
             contentUpdateInterval: 1800 * 1000,

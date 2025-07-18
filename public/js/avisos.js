@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- FUNÇÕES DE UI ---
     
-    // NOVO: Função para criar os checkboxes das telas
+    // Função para criar os checkboxes das telas
     const populateScreenCheckboxes = () => {
         screensContainer.innerHTML = '';
         if (allScreens && allScreens.length > 0) {
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         avisosData.forEach((aviso, index) => {
-            // NOVO: Exibir para quais telas o aviso se destina
+            // Exibir para quais telas o aviso se destina
             const targetScreensInfo = (aviso.targetScreens && aviso.targetScreens.length > 0)
                 ? `<strong>Telas:</strong> ${aviso.targetScreens.join(', ')}`
                 : '<strong>Telas:</strong> Global (todas)';
@@ -104,8 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             avisosContainer.appendChild(card);
         });
     };
-    
-    // ... (LÓGICA DE API e EVENT LISTENERS permanecem os mesmos)
 
     // --- LÓGICA DE API ---
     const fetchAvisos = async () => {

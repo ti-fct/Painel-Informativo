@@ -95,18 +95,20 @@
                                 <%= screen.name %> <small style="font-weight: 400; color: #6c757d;">(ID: <%= screen.id
                                             %>)</small>
                             </h3>
-                            <div class="screen-details">
+<div class="screen-details">
                                 <%
                                     // Mapeia o ID do layout para um texto mais amigável
                                     let layoutText = 'Desconhecido';
-                                    if (screen.layout === 'layout-a') layoutText = 'A - Noticias (Imagem + Texto + QrCode)';
-                                    if (screen.layout === 'layout-b') layoutText = 'B - Avisos (Imagem Cheia)';
-                                    if (screen.layout === 'layout-c') layoutText = 'C - Dinâmico (A/B)';
+                                    if (screen.layout === 'layout-a') layoutText = 'A (Imagem + Texto)';
+                                    if (screen.layout === 'layout-b') layoutText = 'B (Imagem Somente)';
+                                    if (screen.layout === 'layout-c') layoutText = 'C (Dinâmico A+B+D)';
+                                    if (screen.layout === 'layout-d') layoutText = 'D (Agenda/Calendário)';
                                 
                                     // Cria uma lista de fontes de conteúdo ativas
                                     let sources = [];
                                     if (screen.config.includeAvisos) sources.push('Avisos');
                                     if (screen.config.includeRss) sources.push(`RSS (${screen.config.newsQuantity} notícias)`);
+                                    if (screen.config.includeCalendar) sources.push('Calendário');
                                     if (sources.length === 0) sources.push('Nenhuma');
                                 %>
                                 <p><strong>Layout:</strong> <span><%= layoutText %></span></p>
@@ -116,7 +118,13 @@
                                 <% if (screen.config.includeRss && screen.config.rssFeedUrl) { %>
                                     <p><strong>URL do RSS:</strong> <span class="rss-url-value"><%= screen.config.rssFeedUrl %></span></p>
                                 <% } %>
+
+                                <% if (screen.config.includeCalendar && screen.config.calendarId) { %>
+                                    <p><strong>ID da Agenda:</strong> <span class="calendar-id-value"> <%= screen.config.calendarId.length > 20 ? screen.config.calendarId.substring(0, 20) + '...' : screen.config.calendarId %></span></p>
+                                <% } %>
+
                             </div>
+
 
                         </div>
                         <div class="screen-actions">

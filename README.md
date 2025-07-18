@@ -11,13 +11,12 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 - **Painel de Administração:** Uma interface web segura para gerenciar todo o sistema.
 - **Gerenciamento de Telas:** Crie, edite e exclua múltiplas telas de exibição.
 - **Configuração por Tela:** Cada tela pode ter suas próprias fontes de conteúdo e configurações.
-  - Suporte a múltiplos feeds RSS.
-  - Opção para incluir ou não avisos globais.
-  - Intervalo do carrossel configurável.
 - **Gerenciamento de Avisos:** Um CRUD completo para criar avisos com título, descrição, período de validade e imagem. Avisos são exibidos automaticamente durante seu período de vigência.
 - **Layouts Flexíveis:**
   - **Layout A:** Exibição completa com imagem, título, data, descrição e QR Code para o link da notícia.
   - **Layout B:** Exibição só de imagens, ideal para avisos.
+  - **Layout C:** Exibição dinâmica (todos os layouts juntos)
+  - **Layout D:** Exibição de calendário.
 - **Atualização em Tempo Real:** Administradores podem forçar a atualização de todas as telas ativas com um único clique, graças à tecnologia WebSocket.
 - **Persistência de Dados:** Configurações de telas e avisos são salvas em arquivos JSON, funcionando como um banco de dados simples.
 
@@ -31,6 +30,8 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
 - **`ws`:** Biblioteca para implementação do servidor WebSocket para atualizações em tempo real.
 - **`rss-parser`:** Para analisar e extrair dados de feeds RSS.
 - **`cheerio`:** Para fazer parsing de HTML (usado para limpar descrições de notícias).
+- **`googleapi`:** Para busca de dados de agendas.
+- **`outras...`:** Consulte arquivo package.json para visualizar as outras bibliotecas utilizadas.
 
 ### Frontend
 - **HTML5 & CSS3:** Estrutura e estilização das páginas.
@@ -84,7 +85,7 @@ O projeto nasceu da necessidade de substituir um script Python limitado ao Windo
     ```
 
 4.  **Acesse a aplicação:**
-    - O servidor estará rodando em `http://localhost:3000`.
+    - O servidor estará rodando em `http://localhost:3000` (ou no seu IP). 
     - **Painel de Administração:** Acesse `http://localhost:3000/admin/login`
     - **Telas de Exibição:** Serão acessíveis através de URLs como `http://localhost:3000/display/[ID_DA_TELA]`.
 
@@ -104,11 +105,10 @@ Após o login, você verá o dashboard principal, que lista todas as telas criad
 ### Criando/Editando uma Tela
 - **Nome da Tela:** Um nome descritivo (ex: "Tela da Biblioteca", "Painel do Auditório").
 - **Fontes de Conteúdo:**
-  - **Exibir Avisos Globais:** Marque para que esta tela mostre os avisos ativos.
-  - **Exibir Notícias de Feed RSS:** Marque para ativar a busca por notícias. Os campos de URL e quantidade se tornarão visíveis e obrigatórios.
+  - **Selecionar suas fontes:** Escolha e marque a fonte que deseja exibir.
 - **Configurações de Exibição:**
   - **Layout:** Escolha o layout visual para a tela.
-  - **Intervalo do Carrossel:** Tempo em milissegundos que cada slide (notícia ou aviso) ficará visível.
+  - **Intervalo do Carrossel:** Tempo em segundos que cada slide ficará visível.
 
 ### Gerenciando Avisos
 Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atualizar, Deletar) para os avisos.

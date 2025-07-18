@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (progressIntervalId) clearInterval(progressIntervalId);
         if (scrollAnimationId) cancelAnimationFrame(scrollAnimationId);
         
-        // ALTERAÇÃO: Lógica de tela vazia simplificada
+        // Lógica de tela vazia simplificada
         if (!content || content.length === 0) {
             // Mostra a mensagem de tela vazia e esconde o carrossel
             carouselWrapper.style.display = 'none';
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startCarousel() {
         if (carouselIntervalId) clearInterval(carouselIntervalId);
-        // O updateDisplay agora gerencia o que mostrar (carrossel ou tela vazia)
+        // O updateDisplay gerencia o que mostrar (carrossel ou tela vazia)
         updateDisplay(); 
         
         // Só inicia o intervalo se houver conteúdo

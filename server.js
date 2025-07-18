@@ -1,5 +1,5 @@
 // =======================================================
-// 1. IMPORTS
+// 1. IMPORTS e LOGS
 // =======================================================
 const express = require('express');
 const session = require('express-session');
@@ -12,10 +12,6 @@ const multer = require('multer');
 // Carregar variáveis de ambiente do arquivo .env
 require('dotenv').config();
 
-// =======================================================
-// Melhoria nos Logs com Timestamp
-// =======================================================
-
 // Salva as funções de log originais
 const originalLog = console.log;
 const originalWarn = console.warn;
@@ -25,20 +21,19 @@ const originalError = console.error;
 const getTimestamp = () => new Date().toLocaleString('pt-BR');
 
 // Sobrescreve console.log com nível INFO
-console.log = function(...args) {
+console.log = function (...args) {
     originalLog(`[${getTimestamp()}] [INFO]`, ...args);
 };
 
 // Sobrescreve console.warn com nível WARN
-console.warn = function(...args) {
+console.warn = function (...args) {
     originalWarn(`[${getTimestamp()}] [WARN]`, ...args);
 };
 
 // Sobrescreve console.error com nível ERROR
-console.error = function(...args) {
+console.error = function (...args) {
     originalError(`[${getTimestamp()}] [ERROR]`, ...args);
 };
-
 
 // =======================================================
 // 2. CONSTANTES E INICIALIZAÇÃO
@@ -236,7 +231,7 @@ const requireAuth = (req, res, next) => {
     else res.redirect('/admin/login');
 };
 
-/// --- ROTAS PÚBLICAS ---
+// --- ROTAS PÚBLICAS ---
 app.get('/display/:id', async (req, res) => {
     try {
         const db = await readDB();
@@ -248,7 +243,7 @@ app.get('/display/:id', async (req, res) => {
 
         // 2. Passamos esse objeto inteiro para a view.
         //    O EJS terá acesso a `screenId`, `screenName`, `content` e `config`.
-        //    A renderização usará 'layout-a', 'layout-b' ou o novo 'layout-c'
+        //    A renderização usará um dos layouts
         res.render(screen.layout, initialData);
 
     } catch (error) {
@@ -298,7 +293,7 @@ app.get('/admin/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/admin/login'));
 });
 
-// NOVO: Rota para informações do servidor
+// Rota para informações do servidor
 app.get('/api/server-info', requireAuth, (req, res) => {
     res.json({
         serverTime: new Date().toISOString(), // Envia a hora em formato padrão ISO
@@ -311,13 +306,11 @@ app.get('/admin/screen/new', requireAuth, (req, res) => {
     res.render('screen-form', { pageTitle: 'Adicionar Nova Tela', formAction: '/admin/screen/new', screen: null });
 });
 
-// ALTERAÇÃO: Rota de criação de tela
 app.post('/admin/screen/new', requireAuth, async (req, res) => {
     try {
-        // 1. Recebe o valor em segundos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss } = req.body;
+        // Captura os campos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
 
-        // 2. Converte para milissegundos antes de salvar
         const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
 
         const newScreen = {
@@ -327,9 +320,11 @@ app.post('/admin/screen/new', requireAuth, async (req, res) => {
             config: {
                 rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
                 newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
-                carouselInterval: carouselInterval, // 3. Salva o valor em milissegundos
+                carouselInterval,
                 includeAvisos: includeAvisos === 'true',
-                includeRss: includeRss === 'true'
+                includeRss: includeRss === 'true',
+                includeCalendar: includeCalendar === 'true',
+                calendarId: includeCalendar === 'true' ? calendarId : ''
             }
         };
         const db = await readDB();
@@ -349,13 +344,11 @@ app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     res.render('screen-form', { pageTitle: 'Editar Tela', formAction: `/admin/screen/edit/${screen.id}`, screen: screen });
 });
 
-// ALTERAÇÃO: Rota de edição de tela
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        // 1. Recebe o valor em segundos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss } = req.body;
-        
-        // 2. Converte para milissegundos antes de salvar
+        // // Captura alteração dos campos
+        const { name, layout, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
+
         const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
 
         const db = await readDB();
@@ -371,9 +364,11 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
             config: {
                 rssFeedUrl: (includeRss === 'true') ? rssFeedUrl : existingConfig.rssFeedUrl,
                 newsQuantity: (includeRss === 'true') ? parseInt(newsQuantity, 10) : existingConfig.newsQuantity,
-                carouselInterval: carouselInterval, // 3. Salva o valor em milissegundos
+                carouselInterval,
                 includeAvisos: includeAvisos === 'true',
-                includeRss: includeRss === 'true'
+                includeRss: includeRss === 'true',
+                includeCalendar: includeCalendar === 'true',
+                calendarId: (includeCalendar === 'true') ? calendarId : existingConfig.calendarId
             }
         };
 
@@ -384,7 +379,6 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
         res.status(500).send('Erro ao atualizar a tela.');
     }
 });
-
 
 app.post('/admin/screen/delete/:id', requireAuth, async (req, res) => {
     const db = await readDB();
@@ -399,7 +393,7 @@ app.post('/admin/refresh-all', requireAuth, (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// MODIFICAÇÃO: Passar a lista de telas para a view
+// Passar a lista de telas para a view
 app.get('/admin/avisos', requireAuth, async (req, res) => {
     try {
         const db = await readDB();
@@ -419,7 +413,7 @@ app.get('/api/avisos', async (req, res) => {
     res.json(avisos);
 });
 
-// MODIFICAÇÃO: Capturar e salvar 'targetScreens'
+// Capturar e salvar 'targetScreens'
 app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, res) => {
     const { titulo, descricao, data_inicio, data_fim, link, targetScreens } = req.body;
     if (!titulo || !descricao) {
@@ -441,7 +435,7 @@ app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, re
     res.status(201).json({ success: true, message: 'Aviso criado com sucesso!' });
 });
 
-// MODIFICAÇÃO: Capturar e atualizar 'targetScreens'
+// Capturar e atualizar 'targetScreens'
 app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (req, res) => {
     const avisos = await readAvisos();
     const index = parseInt(req.params.index);
@@ -450,7 +444,7 @@ app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (r
     // Garante que 'targetScreens' seja sempre um array
     const { targetScreens, ...otherBodyData } = req.body;
     const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
-    
+
     const updatedAviso = { ...avisos[index], ...otherBodyData, targetScreens: screensArray };
     delete updatedAviso.aviso_index;
 

@@ -128,7 +128,3 @@ html {
     padding: 2rem;
     text-align: center;
 }
-
-/* Remove a media query desnecessária que poderia estar causando conflito */
-/* @media (max-width: 899px) { ... }  <-- REMOVIDA */
-

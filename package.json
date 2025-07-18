@@ -17,6 +17,7 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
+    "googleapis": "^153.0.0",
     "multer": "^2.0.1",
     "rss-parser": "^3.13.0",
     "ws": "^8.18.2"
