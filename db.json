@@ -2,26 +2,39 @@
   "screens": [
     {
       "id": "001",
-      "name": "Tela Exemplo 1",
+      "name": "Hall - Porta dos Elevadores",
       "config": {
         "rssFeedUrl": "https://fct.ufg.br/feed",
-        "newsQuantity": 4,
-        "carouselInterval": 20000,
+        "newsQuantity": 5,
+        "carouselInterval": 15000,
         "includeAvisos": true,
         "includeRss": true,
-        "includeCalendar": false,
+        "includeCalendar": true,
         "calendarId": "c_851e8fcd8b81aa4d25fe7044895c1fa3bd8422912a043548c0291dd9a1b28e3f@group.calendar.google.com"
       }
     },
     {
       "id": "002",
-      "name": "Tela Exemplo 2",
+      "name": "3° e 5° - Porta dos Elevadores",
       "config": {
-        "rssFeedUrl": "https://ufg.br/feed",
-        "newsQuantity": 5,
-        "carouselInterval": 20000,
+        "rssFeedUrl": "https://fct.ufg.br/feed",
+        "newsQuantity": 3,
+        "carouselInterval": 15000,
         "includeAvisos": true,
-        "includeRss": false,
+        "includeRss": true,
+        "includeCalendar": true,
+        "calendarId": "c_851e8fcd8b81aa4d25fe7044895c1fa3bd8422912a043548c0291dd9a1b28e3f@group.calendar.google.com"
+      }
+    },
+    {
+      "id": "003",
+      "name": "Hall - Porta do Auditório",
+      "config": {
+        "rssFeedUrl": "https://fct.ufg.br/feed",
+        "newsQuantity": 3,
+        "carouselInterval": 15000,
+        "includeAvisos": true,
+        "includeRss": true,
         "includeCalendar": true,
         "calendarId": "c_851e8fcd8b81aa4d25fe7044895c1fa3bd8422912a043548c0291dd9a1b28e3f@group.calendar.google.com"
       }

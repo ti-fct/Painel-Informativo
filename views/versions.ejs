@@ -1,0 +1,74 @@
+<%- include('_admin-header', { pageTitle: 'Histórico de Versões' }) %>
+
+<style>
+    /* Estilos específicos para a página de versões para melhorar a leitura */
+    .versions-content {
+        background-color: var(--color-white);
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border);
+        max-width: 900px; /* Limita a largura para melhor legibilidade */
+        margin: 0 auto; /* Centraliza o conteúdo */
+    }
+
+    .versions-content h1 {
+        color: var(--color-dark);
+        border-bottom: 2px solid var(--color-primary);
+        padding-bottom: 0.5rem;
+        margin-top: 0;
+    }
+
+    .versions-content h2 {
+        color: var(--color-primary);
+        margin-top: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--color-medium-gray);
+    }
+
+    .versions-content ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .versions-content li {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .versions-content li::before {
+        content: '✓'; /* Ícone de check */
+        color: var(--color-success);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+
+    .versions-content hr {
+        border: 0;
+        height: 1px;
+        background-color: var(--color-border);
+        margin: 2rem 0;
+    }
+
+    .versions-content strong {
+        color: var(--color-dark);
+    }
+</style>
+
+<div class="toolbar">
+    <h2>Histórico de Versões e Melhorias</h2>
+</div>
+
+<div class="versions-content">
+    <!-- 
+      Usamos <%- %> (com hífen) em vez de <%= %> 
+      para que o EJS renderize o conteúdo como HTML puro, 
+      em vez de texto com as tags visíveis.
+    -->
+    <%- versionsHtml %>
+</div>
+
+<%- include('_admin-footer') %>
+</body>
+</html>

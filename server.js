@@ -8,6 +8,7 @@ const fs = require('fs').promises;
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const multer = require('multer');
+const showdown = require('showdown'); 
 
 // Carregar variáveis de ambiente do arquivo .env
 require('dotenv').config();
@@ -390,6 +391,34 @@ app.get('/admin/avisos', requireAuth, async (req, res) => {
         res.status(500).render('avisos', { screens: [] }); 
     }
 });
+
+// --- ROTA DE VERSÕES ---
+app.get('/admin/versions', requireAuth, async (req, res) => {
+    try {
+        // Caminho para o arquivo markdown
+        const versionsPath = path.join(__dirname, 'versions.md');
+        
+        // Lê o conteúdo do arquivo
+        const markdownContent = await fs.readFile(versionsPath, 'utf-8');
+        
+        // Inicializa o conversor de markdown
+        const converter = new showdown.Converter();
+        
+        // Converte o conteúdo para HTML
+        const versionsHtml = converter.makeHtml(markdownContent);
+
+        // Renderiza a nova view 'versions.ejs', passando o HTML gerado
+        res.render('versions', { 
+            pageTitle: 'Histórico de Versões', 
+            versionsHtml: versionsHtml 
+        });
+
+    } catch (error) {
+        console.error('Erro ao ler ou converter o arquivo de versões:', error);
+        res.status(500).send('Não foi possível carregar o histórico de versões.');
+    }
+});
+
 
 // =======================================================
 // 8. API DE AVISOS 
