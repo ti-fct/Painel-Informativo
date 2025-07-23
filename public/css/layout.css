@@ -23,7 +23,7 @@ html {
 
 .main-header h1 {
     margin: 0;
-    padding-top: 8px;
+    padding-top: 10px;  /* Ajuste para bora dos tablets*/
     font-size: 28px;
     font-weight: bold;
 }
@@ -260,7 +260,7 @@ body.layout-d-active .events-list-header {
     flex-shrink: 0;
 }
 
-body.layout-d-active .col-date { flex: 0 0 25%; }
+body.layout-d-active .col-date { flex: 0 0 30%; }
 body.layout-d-active .col-summary { flex: 1; min-width: 0; }
 
 body.layout-d-active .events-list-body {
