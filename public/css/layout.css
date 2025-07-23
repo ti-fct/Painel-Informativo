@@ -1,0 +1,370 @@
+/* ======================================================= */
+/* 1. ESTILOS GLOBAIS E COMUNS (RESET, CABEÇALHO, ETC.)
+/* ======================================================= */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif; /* Fonte padrão */
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.main-header {
+    background-color: #0072b9;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.main-header h1 {
+    margin: 0;
+    padding-top: 8px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.content-container {
+    display: flex;
+    height: calc(100vh - 60px);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* ======================================================= */
+/* 2. CONTÊINERES PRINCIPAIS (VISIBILIDADE)
+/* ======================================================= */
+
+/* Por padrão, esconde ambos os wrappers. O JS decide qual mostrar. */
+.carousel-wrapper, .calendar-wrapper {
+    display: none;
+}
+
+/* Regras para mostrar o wrapper correto com base na classe do body */
+body.layout-a-active .carousel-wrapper,
+body.layout-b-active .carousel-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+body.layout-d-active .calendar-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex; /* O display original do calendar-wrapper */
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+
+/* ======================================================= */
+/* 3. ESTILOS PARA "LAYOUT-A" (NOTÍCIAS)
+/* Ativado quando <body> tem a classe .layout-a-active
+/* ======================================================= */
+body.layout-a-active .carousel-item-content {
+    flex-grow: 1;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+}
+
+body.layout-a-active .image-container {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    position: relative;
+}
+
+body.layout-a-active .text-container {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+body.layout-a-active .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block; /* Garante que a imagem seja exibida */
+}
+
+body.layout-a-active #carousel-title {
+    font-size: 2.2vw;
+    font-weight: bold;
+    color: #0072b9;
+    margin: 0 0 10px 0;
+}
+
+body.layout-a-active #carousel-date {
+    font-size: 1.2vw;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+body.layout-a-active .description-scroll-area {
+    flex-grow: 1;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-right: 15px;
+}
+
+body.layout-a-active .description-scroll-area::-webkit-scrollbar {
+    display: none;
+}
+
+body.layout-a-active #carousel-description {
+    font-size: 1.8vw;
+    color: #333;
+    text-align: justify;
+}
+
+body.layout-a-active .qr-code-container {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+body.layout-a-active #qr-code {
+    width: 120px;
+    height: 120px;
+}
+
+/* Layout A - Responsivo */
+@media (max-width: 899px) {
+    body.layout-a-active .carousel-item-content {
+        flex-direction: column;
+    }
+    body.layout-a-active .image-container {
+        min-height: 200px;
+        max-height: 40%;
+    }
+    body.layout-a-active #carousel-title { font-size: 24px; }
+    body.layout-a-active #carousel-date { font-size: 16px; }
+    body.layout-a-active #carousel-description { font-size: 18px; }
+}
+
+
+/* ======================================================= */
+/* 4. ESTILOS PARA "LAYOUT-B" (AVISOS)
+/* Ativado quando <body> tem a classe .layout-b-active
+/* ======================================================= */
+body.layout-b-active .carousel-item-content {
+    flex-grow: 1;
+    display: flex;
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+body.layout-b-active .image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: none;
+    background-color: transparent;
+    flex: 1;
+}
+
+body.layout-b-active .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block; /* Garante que a imagem seja exibida */
+}
+
+/* Esconde o container de texto no layout B */
+body.layout-b-active .text-container {
+    display: none;
+}
+
+
+/* ======================================================= */
+/* 5. ESTILOS PARA "LAYOUT-D" (CALENDÁRIO)
+/* Ativado quando <body> tem a classe .layout-d-active
+/* ======================================================= */
+body.layout-d-active {
+    --primary-color: #005a9c;
+    --text-color: #333;
+    --text-color-light: #6c757d;
+    --border-color: #dee2e6;
+    --bg-color-light: #f8f9fa;
+    --color-white: #ffffff;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --current-bg: #fffbe6;
+    --current-border: #ffe58f;
+    --next-bg: #e6f7ff;
+    --next-border: var(--primary-color);
+}
+
+body.layout-d-active .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+body.layout-d-active .calendar-header h2 {
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 1.75rem;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+body.layout-d-active .clock {
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+body.layout-d-active .events-list-wrapper {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+body.layout-d-active .events-list-header {
+    display: flex;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--bg-color-light);
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: var(--text-color-light);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+body.layout-d-active .col-date { flex: 0 0 25%; }
+body.layout-d-active .col-summary { flex: 1; min-width: 0; }
+
+body.layout-d-active .events-list-body {
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+body.layout-d-active .events-list-body::-webkit-scrollbar { display: none; }
+
+body.layout-d-active .event-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s;
+}
+body.layout-d-active .event-item:nth-child(even) {
+    background-color: var(--bg-color-light);
+}
+body.layout-d-active .event-item div {
+    padding-right: 1rem;
+    overflow: hidden;
+}
+body.layout-d-active .event-item .col-date {
+    font-weight: 500;
+    font-size: 1.25rem;
+    line-height: 1.5;
+}
+body.layout-d-active .col-date .time-range {
+    color: var(--text-color-light);
+    font-size: 1.1rem;
+}
+body.layout-d-active .col-date .multiday-label {
+    color: var(--text-color-light);
+    font-weight: 400;
+}
+body.layout-d-active .event-item .col-summary {
+    font-weight: 500;
+    font-size: 1.5rem;
+    white-space: normal;
+}
+body.layout-d-active .event-item.current-event {
+    background-color: var(--current-bg) !important;
+    border-left: 6px solid var(--current-border);
+}
+body.layout-d-active .event-item.next-event {
+    background-color: var(--next-bg) !important;
+    border-left: 6px solid var(--next-border);
+}
+
+body.layout-d-active .calendar-footer {
+    padding: 0.5rem 1.5rem;
+    text-align: right;
+    font-size: 0.875rem;
+    color: var(--text-color-light);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    background-color: var(--bg-color-light);
+}
+
+
+/* ======================================================= */
+/* 6. ESTILOS COMUNS (PROGRESSO, VAZIO, RESPONSIVO)
+/* ======================================================= */
+.progress-bar-container {
+    height: 5px;
+    width: 100%;
+    background-color: #eee;
+    flex-shrink: 0;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #0072b9;
+    transition: width 0.1s linear;
+}
+
+.image-placeholder {
+    color: #888;
+}
+
+#empty-state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#empty-state-container h2 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #6c757d;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Responsividade Global */
+@media (max-width: 768px) {
+    .main-header { height: 50px; }
+    .main-header h1 { font-size: 1.25rem; padding-top: 10px; }
+    .content-container { height: calc(100vh - 50px); }
+}

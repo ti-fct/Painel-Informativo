@@ -42,22 +42,32 @@
         </fieldset>
         <br />
         <fieldset>
+            <legend>Fonte de Conteúdo: Calendário</legend>
+            <div class="form-group form-group-inline">
+                <label for="includeCalendar">Exibir Calendário Google</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="includeCalendar" name="includeCalendar" value="true" <% if (screen &&
+                        screen.config.includeCalendar) { %>checked<% } %>>
+                        <span class="slider"></span>
+                </label>
+            </div>
+            <div id="calendar-fields-container">
+                <div class="form-group">
+                    <label for="calendarId">ID do Calendário Google Público</label>
+                    <input type="text" id="calendarId" name="calendarId" placeholder="exemplo@group.calendar.google.com"
+                        value="<%= screen && screen.config.calendarId ? screen.config.calendarId : '' %>">
+                    <small style="display: block; margin-top: 0.5rem;">O calendário precisa estar configurado como
+                        "Público" nas configurações de compartilhamento do Google Agenda.</small>
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset>
             <legend>Configurações de Exibição</legend>
             <div class="form-group">
-                <label for="layout">Layout</label>
-                <select id="layout" name="layout">
-                    <option value="layout-a" <%=(screen && screen.layout==='layout-a' ) ? 'selected' : '' %>>
-                        Layout A (Imagem + Texto)
-                    </option>
-                    <option value="layout-b" <%=(screen && screen.layout==='layout-b' ) ? 'selected' : '' %>>
-                        Layout B (Somente para Avisos - Imagens)
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="carouselInterval">Intervalo do Carrossel (ms)</label>
-                <input type="number" id="carouselInterval" name="carouselInterval" min="5000" step="1000" required
-                    value="<%= screen ? screen.config.carouselInterval : '20000' %>">
+                <label for="carouselIntervalSeconds">Intervalo por Item (segundos)</label>
+                <input type="number" id="carouselIntervalSeconds" name="carouselIntervalSeconds" min="5" step="1"
+                    required value="<%= screen ? (screen.config.carouselInterval / 1000) : '20' %>">
             </div>
         </fieldset>
 
@@ -70,32 +80,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const includeRssToggle = document.getElementById('includeRss');
-            const rssUrlInput = document.getElementById('rssFeedUrl');
-            const newsQuantityInput = document.getElementById('newsQuantity');
+            const includeCalendarToggle = document.getElementById('includeCalendar');
+            const calendarFieldsContainer = document.getElementById('calendar-fields-container');
+            const calendarIdInput = document.getElementById('calendarId');
 
-            function toggleRssFields() {
-                // Se o toggle estiver LIGADO
-                if (includeRssToggle.checked) {
-                    rssUrlInput.disabled = false;
-                    newsQuantityInput.disabled = false;
-                    rssUrlInput.required = true; // Torna o campo obrigatório
-                } else { // Se o toggle estiver DESLIGADO
-                    rssUrlInput.disabled = true;
-                    newsQuantityInput.disabled = true;
-                    rssUrlInput.required = false; // Deixa de ser obrigatório
+            function toggleCalendarFields() {
+                if (includeCalendarToggle.checked) {
+                    calendarFieldsContainer.style.display = 'block';
+                    calendarIdInput.required = true;
+                } else {
+                    calendarFieldsContainer.style.display = 'none';
+                    calendarIdInput.required = false;
                 }
             }
-
-            // Executa a função quando a página carrega
-            toggleRssFields();
-
-            // Adiciona o listener para futuras mudanças no toggle
-            includeRssToggle.addEventListener('change', toggleRssFields);
+            toggleCalendarFields();
+            includeCalendarToggle.addEventListener('change', toggleCalendarFields);
         });
     </script>
 
     <%- include('_admin-footer') %>
         </body>
-
         </html>

@@ -1,6 +1,4 @@
 <%- include('_admin-header', { pageTitle: 'Dashboard' }) %>
-
-    <!-- NOVO: Estilos para a barra de informações -->
     <style>
         .info-bar {
             display: flex;
@@ -33,9 +31,29 @@
             font-weight: 700;
             color: var(--color-primary);
         }
+        
+        .screen-details {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .screen-details p {
+            margin: 0.4rem 0;
+            color: var(--color-body-text);
+            display: flex; 
+            flex-wrap: wrap; 
+        }
+        .screen-details strong {
+            color: var(--color-dark);
+            margin-right: 0.5rem;
+            flex-shrink: 0; 
+        }
+        
+        .rss-url-value {
+            word-break: break-all;
+            color: #6c757d;
+        }
     </style>
 
-    <!-- NOVO: Barra de informações -->
     <div class="info-bar">
         <div class="info-item">
             <span class="label">Telas Ativas</span>
@@ -72,8 +90,25 @@
                                 <%= screen.name %> <small style="font-weight: 400; color: #6c757d;">(ID: <%= screen.id
                                             %>)</small>
                             </h3>
-                            <p>RSS: <%= screen.config.rssFeedUrl %>
-                            </p>
+                            <div class="screen-details">
+                                <%
+                                    let sources = [];
+                                    if (screen.config.includeAvisos) sources.push('Avisos');
+                                    if (screen.config.includeRss) sources.push(`RSS (${screen.config.newsQuantity} notícias)`);
+                                    if (screen.config.includeCalendar) sources.push('Calendário');
+                                    if (sources.length === 0) sources.push('Nenhuma');
+                                %>
+                                <p><strong>Intervalo:</strong> <span><%= screen.config.carouselInterval / 1000 %>s</span></p>
+                                <p><strong>Fontes:</strong> <span><%= sources.join(', ') %></span></p>
+
+                                <% if (screen.config.includeRss && screen.config.rssFeedUrl) { %>
+                                    <p><strong>URL do RSS:</strong> <span class="rss-url-value"><%= screen.config.rssFeedUrl %></span></p>
+                                <% } %>
+
+                                <% if (screen.config.includeCalendar && screen.config.calendarId) { %>
+                                    <p><strong>ID da Agenda:</strong> <span class="calendar-id-value"> <%= screen.config.calendarId.length > 20 ? screen.config.calendarId.substring(0, 20) + '...' : screen.config.calendarId %></span></p>
+                                <% } %>
+                            </div>
                         </div>
                         <div class="screen-actions">
                             <a href="/display/<%= screen.id %>" target="_blank" class="btn btn-secondary">Visualizar</a>
@@ -85,12 +120,12 @@
                         </div>
                     </div>
                     <% }); %>
-                        <% } %>
+                <% } %>
     </section>
 
     <%- include('_admin-footer') %>
 
-        <script src="/js/dashboard.js"></script>
-        </body>
+    <script src="/js/dashboard.js"></script>
+</body>
 
-        </html>
+</html>

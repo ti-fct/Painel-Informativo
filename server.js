@@ -1,5 +1,5 @@
 // =======================================================
-// 1. IMPORTS
+// 1. IMPORTS e LOGS
 // =======================================================
 const express = require('express');
 const session = require('express-session');
@@ -8,13 +8,10 @@ const fs = require('fs').promises;
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const multer = require('multer');
+const showdown = require('showdown'); 
 
 // Carregar variáveis de ambiente do arquivo .env
 require('dotenv').config();
-
-// =======================================================
-// Melhoria nos Logs com Timestamp
-// =======================================================
 
 // Salva as funções de log originais
 const originalLog = console.log;
@@ -25,20 +22,19 @@ const originalError = console.error;
 const getTimestamp = () => new Date().toLocaleString('pt-BR');
 
 // Sobrescreve console.log com nível INFO
-console.log = function(...args) {
+console.log = function (...args) {
     originalLog(`[${getTimestamp()}] [INFO]`, ...args);
 };
 
 // Sobrescreve console.warn com nível WARN
-console.warn = function(...args) {
+console.warn = function (...args) {
     originalWarn(`[${getTimestamp()}] [WARN]`, ...args);
 };
 
 // Sobrescreve console.error com nível ERROR
-console.error = function(...args) {
+console.error = function (...args) {
     originalError(`[${getTimestamp()}] [ERROR]`, ...args);
 };
-
 
 // =======================================================
 // 2. CONSTANTES E INICIALIZAÇÃO
@@ -73,8 +69,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.urlencoded({ extended: true }));
+
+// Validação do SESSION_SECRET ao iniciar
+if (!process.env.SESSION_SECRET) {
+    console.warn("AVISO: A variável de ambiente SESSION_SECRET não está definida. Usando um valor padrão inseguro.");
+    console.warn("Para produção, copie .env.example para .env e defina um SESSION_SECRET único e seguro.");
+}
+
 app.use(session({
-    secret: 'seu-segredo-super-secreto-aqui-troque-depois',
+    // ALTERAÇÃO: Usa a variável de ambiente ou um fallback com aviso.
+    secret: process.env.SESSION_SECRET || 'insecure-default-secret-for-dev',
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 24 * 60 * 60 * 1000 }
@@ -228,19 +232,16 @@ const requireAuth = (req, res, next) => {
     else res.redirect('/admin/login');
 };
 
-/// --- ROTAS PÚBLICAS ---
+// --- ROTAS PÚBLICAS ---
 app.get('/display/:id', async (req, res) => {
     try {
         const db = await readDB();
         const screen = db.screens.find(s => s.id === req.params.id);
         if (!screen) return res.status(404).send('Tela não encontrada.');
 
-        // 1. O contentManager retorna um objeto completo com todas as informações.
         const initialData = await contentManager.fetchContent(screen);
-
-        // 2. Passamos esse objeto inteiro para a view.
-        //    O EJS terá acesso a `screenId`, `screenName`, `content` e `config`.
-        res.render(screen.layout, initialData);
+        
+        res.render('layout', initialData);
 
     } catch (error) {
         console.error("Erro ao carregar tela de exibição:", error);
@@ -269,11 +270,9 @@ app.get('/', (req, res) => res.redirect('/admin/login'));
 app.get('/admin/login', (req, res) => res.render('login', { error: null }));
 
 app.post('/admin/login', (req, res) => {
-    // Lê as credenciais das variáveis de ambiente
     const adminUser = process.env.ADMIN_USERNAME || 'admin';
-    const adminPass = process.env.ADMIN_PASSWORD || 'admin'; // 'admin' como fallback de segurança
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin'; 
 
-    // ALTERADO: Comparação com as variáveis de ambienteNPM
     if (req.body.username === adminUser && req.body.password === adminPass) {
         req.session.isLoggedIn = true;
         res.redirect('/admin/dashboard');
@@ -289,11 +288,11 @@ app.get('/admin/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/admin/login'));
 });
 
-// NOVO: Rota para informações do servidor
+// Rota para informações do servidor
 app.get('/api/server-info', requireAuth, (req, res) => {
     res.json({
-        serverTime: new Date().toISOString(), // Envia a hora em formato padrão ISO
-        updateInterval: 1800 // Intervalo de 30 minutos em segundos
+        serverTime: new Date().toISOString(), 
+        updateInterval: 1800 
     });
 });
 
@@ -301,22 +300,23 @@ app.get('/api/server-info', requireAuth, (req, res) => {
 app.get('/admin/screen/new', requireAuth, (req, res) => {
     res.render('screen-form', { pageTitle: 'Adicionar Nova Tela', formAction: '/admin/screen/new', screen: null });
 });
+
 app.post('/admin/screen/new', requireAuth, async (req, res) => {
     try {
-        // Captura os novos campos
-        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
-
+        const { name, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
+        const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
+        
         const newScreen = {
             id: await generateNextScreenId(),
             name,
-            layout,
             config: {
-                // Se o RSS não for incluído, salva uma string vazia ou o valor fornecido
                 rssFeedUrl: includeRss === 'true' ? rssFeedUrl : '',
                 newsQuantity: includeRss === 'true' ? parseInt(newsQuantity, 10) : 0,
-                carouselInterval: parseInt(carouselInterval, 10),
+                carouselInterval,
                 includeAvisos: includeAvisos === 'true',
-                includeRss: includeRss === 'true' // Salva o estado do toggle
+                includeRss: includeRss === 'true',
+                includeCalendar: includeCalendar === 'true',
+                calendarId: includeCalendar === 'true' ? calendarId : ''
             }
         };
         const db = await readDB();
@@ -328,40 +328,35 @@ app.post('/admin/screen/new', requireAuth, async (req, res) => {
         res.status(500).send('Erro ao salvar a tela.');
     }
 });
+
 app.get('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     const db = await readDB();
     const screen = db.screens.find(s => s.id === req.params.id);
     if (!screen) return res.status(404).send('Tela não encontrada.');
     res.render('screen-form', { pageTitle: 'Editar Tela', formAction: `/admin/screen/edit/${screen.id}`, screen: screen });
 });
+
 app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
     try {
-        const { name, layout, rssFeedUrl, newsQuantity, carouselInterval, includeAvisos, includeRss } = req.body;
+        const { name, rssFeedUrl, newsQuantity, carouselIntervalSeconds, includeAvisos, includeRss, includeCalendar, calendarId } = req.body;
+        const carouselInterval = parseInt(carouselIntervalSeconds, 10) * 1000;
         const db = await readDB();
-
         const screenIndex = db.screens.findIndex(s => s.id === req.params.id);
         if (screenIndex === -1) return res.status(404).send('Tela não encontrada.');
 
-        // Pega a configuração existente para usar como base
         const existingConfig = db.screens[screenIndex].config;
 
-        // Atualiza os dados da tela
         db.screens[screenIndex] = {
             id: req.params.id,
             name,
-            layout,
             config: {
-                rssFeedUrl: (includeRss === 'true')
-                    ? rssFeedUrl // Se RSS estiver LIGADO, usa o novo valor do formulário
-                    : existingConfig.rssFeedUrl, // Se estiver DESLIGADO, mantém o valor antigo
-
-                newsQuantity: (includeRss === 'true')
-                    ? parseInt(newsQuantity, 10) // Se RSS estiver LIGADO, usa o novo valor
-                    : existingConfig.newsQuantity, // Se estiver DESLIGADO, mantém o valor antigo
-
-                carouselInterval: parseInt(carouselInterval, 10),
+                rssFeedUrl: (includeRss === 'true') ? rssFeedUrl : existingConfig.rssFeedUrl,
+                newsQuantity: (includeRss === 'true') ? parseInt(newsQuantity, 10) : existingConfig.newsQuantity,
+                carouselInterval,
                 includeAvisos: includeAvisos === 'true',
-                includeRss: includeRss === 'true'
+                includeRss: includeRss === 'true',
+                includeCalendar: includeCalendar === 'true',
+                calendarId: (includeCalendar === 'true') ? calendarId : existingConfig.calendarId
             }
         };
 
@@ -372,6 +367,7 @@ app.post('/admin/screen/edit/:id', requireAuth, async (req, res) => {
         res.status(500).send('Erro ao atualizar a tela.');
     }
 });
+
 app.post('/admin/screen/delete/:id', requireAuth, async (req, res) => {
     const db = await readDB();
     db.screens = db.screens.filter(s => s.id !== req.params.id);
@@ -385,17 +381,44 @@ app.post('/admin/refresh-all', requireAuth, (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// MODIFICAÇÃO: Passar a lista de telas para a view
+// Passar a lista de telas para a view
 app.get('/admin/avisos', requireAuth, async (req, res) => {
     try {
         const db = await readDB();
-        // Passa a lista de telas para que o formulário possa renderizar as opções
         res.render('avisos', { screens: db.screens || [] });
     } catch (error) {
         console.error("Erro ao carregar página de avisos:", error);
-        res.status(500).render('avisos', { screens: [] }); // Renderiza a página mesmo com erro
+        res.status(500).render('avisos', { screens: [] }); 
     }
 });
+
+// --- ROTA DE VERSÕES ---
+app.get('/admin/versions', requireAuth, async (req, res) => {
+    try {
+        // Caminho para o arquivo markdown
+        const versionsPath = path.join(__dirname, 'versions.md');
+        
+        // Lê o conteúdo do arquivo
+        const markdownContent = await fs.readFile(versionsPath, 'utf-8');
+        
+        // Inicializa o conversor de markdown
+        const converter = new showdown.Converter();
+        
+        // Converte o conteúdo para HTML
+        const versionsHtml = converter.makeHtml(markdownContent);
+
+        // Renderiza a nova view 'versions.ejs', passando o HTML gerado
+        res.render('versions', { 
+            pageTitle: 'Histórico de Versões', 
+            versionsHtml: versionsHtml 
+        });
+
+    } catch (error) {
+        console.error('Erro ao ler ou converter o arquivo de versões:', error);
+        res.status(500).send('Não foi possível carregar o histórico de versões.');
+    }
+});
+
 
 // =======================================================
 // 8. API DE AVISOS 
@@ -405,21 +428,18 @@ app.get('/api/avisos', async (req, res) => {
     res.json(avisos);
 });
 
-// MODIFICAÇÃO: Capturar e salvar 'targetScreens'
+// Capturar e salvar 'targetScreens'
 app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, res) => {
     const { titulo, descricao, data_inicio, data_fim, link, targetScreens } = req.body;
     if (!titulo || !descricao) {
         return res.status(400).json({ success: false, message: 'Título e descrição são obrigatórios.' });
     }
-
-    // Garante que 'targetScreens' seja sempre um array
     const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
-
     const avisos = await readAvisos();
     const newAviso = {
         titulo, descricao, data_inicio, data_fim, link: link || '',
         url_imagem: req.file ? getFullImageUrl(req, req.file.filename) : '',
-        targetScreens: screensArray // Salva o array de telas
+        targetScreens: screensArray
     };
     avisos.push(newAviso);
     await writeAvisos(avisos);
@@ -427,19 +447,15 @@ app.post('/api/avisos', requireAuth, upload.single('url_imagem'), async (req, re
     res.status(201).json({ success: true, message: 'Aviso criado com sucesso!' });
 });
 
-// MODIFICAÇÃO: Capturar e atualizar 'targetScreens'
+// Capturar e atualizar 'targetScreens'
 app.put('/api/avisos/:index', requireAuth, upload.single('url_imagem'), async (req, res) => {
     const avisos = await readAvisos();
     const index = parseInt(req.params.index);
     if (index < 0 || index >= avisos.length) return res.status(404).json({ success: false, message: 'Aviso não encontrado.' });
-
-    // Garante que 'targetScreens' seja sempre um array
     const { targetScreens, ...otherBodyData } = req.body;
     const screensArray = Array.isArray(targetScreens) ? targetScreens : (targetScreens ? [targetScreens] : []);
-    
     const updatedAviso = { ...avisos[index], ...otherBodyData, targetScreens: screensArray };
     delete updatedAviso.aviso_index;
-
     if (req.file) {
         updatedAviso.url_imagem = getFullImageUrl(req, req.file.filename);
     }
@@ -452,43 +468,28 @@ app.delete('/api/avisos/:index', requireAuth, async (req, res) => {
     try {
         const avisos = await readAvisos();
         const index = parseInt(req.params.index, 10);
-
-        // Validação: garante que o índice é um número válido e está dentro dos limites do array
         if (isNaN(index) || index < 0 || index >= avisos.length) {
             return res.status(404).json({ success: false, message: 'Aviso não encontrado ou índice inválido.' });
         }
-
-        // Remove o aviso do array usando splice.
-        // O splice retorna um array com os itens removidos, então pegamos o primeiro (e único) item.
         const [deletedAviso] = avisos.splice(index, 1);
-
-        // Lógica para remover a imagem associada, se houver
         if (deletedAviso && deletedAviso.url_imagem && deletedAviso.url_imagem.includes('/uploads/')) {
             try {
-                // Extrai o nome do arquivo da URL completa
                 const imageFilename = path.basename(new URL(deletedAviso.url_imagem).pathname);
                 const imagePath = path.join(UPLOADS_DIR, imageFilename);
 
-                // Verifica se o arquivo existe antes de tentar apagar
-                if (fs.existsSync(imagePath)) {
-                    await fs.unlink(imagePath); // Usa a versão assíncrona
+                // Módulo fs/promises não tem 'existsSync', usamos o 'fs' normal para isso ou um try/catch com 'access'
+                const fsSync = require('fs');
+                if (fsSync.existsSync(imagePath)) {
+                    await fs.unlink(imagePath);
                     console.log(`Imagem removida: ${imagePath}`);
                 }
             } catch (e) {
-                // Loga o erro, mas não impede a resposta de sucesso, pois o aviso foi removido do JSON.
                 console.error("Não foi possível remover o arquivo de imagem associado:", e.message);
             }
         }
-
-        // Salva o array modificado de volta no arquivo JSON
         await writeAvisos(avisos);
-
-        // Dispara o refresh para todas as telas ativas
         broadcastRefresh();
-
-        // Responde com sucesso
         res.json({ success: true, message: 'Aviso removido com sucesso!' });
-
     } catch (error) {
         console.error('Erro ao excluir aviso:', error);
         res.status(500).json({ success: false, message: 'Erro interno no servidor ao tentar excluir o aviso.' });

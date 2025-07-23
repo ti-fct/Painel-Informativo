@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Informativo FCT/UFG</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-screen-id="<%= screenId %>">
+    <header class="main-header">
+        <h1>Painel Informativo FCT/UFG</h1>
+    </header>
+
+    <main class="content-container">
+        <div id="empty-state-container" style="display: none;">
+            <h2>Nenhum conteúdo configurado para esta tela.</h2>
+        </div>
+
+        <div class="carousel-wrapper">
+            <div class="carousel-item-content">
+                <div class="image-container">
+                    <img id="carousel-image" src="" alt="Imagem do conteúdo">
+                    <div class="image-placeholder">Carregando...</div>
+                </div>
+                <div class="text-container">
+                    <h2 id="carousel-title">Carregando conteúdo...</h2>
+                    <p id="carousel-date"></p>
+                    <div class="description-scroll-area">
+                        <div id="carousel-description"></div>
+                    </div>
+                    <div class="qr-code-container">
+                        <div id="qr-code"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="calendar-wrapper">
+            <header class="calendar-header">
+                <h2>Próximos Eventos</h2>
+                <div class="clock" id="clock">--:--:--</div>
+            </header>
+            
+            <div class="events-list-wrapper">
+                <div class="events-list-header">
+                    <div class="col-date">Data</div>
+                    <div class="col-summary">Evento</div>
+                </div>
+                <div id="events-list" class="events-list-body">
+                </div>
+            </div>
+
+            <footer class="calendar-footer">
+                Atualizado em: <span id="last-updated">--:--:--</span>
+            </footer>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="calendar-progress-bar"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    const initialData = <%- JSON.stringify({ screenId, screenName, content, config, calendarEvents }) %>;
+    </script>
+
+    <script src="/js/qrcode.min.js"></script>
+    <script src="/js/display.js"></script>
+</body>
+
+</html>
