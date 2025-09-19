@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const carouselWrapper = document.querySelector('.carousel-wrapper');
     const calendarWrapper = document.querySelector('.calendar-wrapper');
     const emptyStateContainer = document.getElementById('empty-state-container');
-    
+
     // -- Seletores para layouts A e B
     const titleEl = document.getElementById('carousel-title');
     const dateEl = document.getElementById('carousel-date');
@@ -29,12 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const imagePlaceholder = document.querySelector('.image-placeholder');
     const qrCodeEl = document.getElementById('qr-code');
     const descriptionArea = document.querySelector('.description-scroll-area');
-    
+
     // -- Seletores para layout D (Calendário)
     const eventsListEl = document.getElementById('events-list');
     const clockEl = document.getElementById('clock');
     const lastUpdatedEl = document.getElementById('last-updated');
-    
+
     // -- Seletores das barras de progresso
     const carouselProgressBarEl = document.getElementById('progress-bar');
     const calendarProgressBarEl = document.getElementById('calendar-progress-bar');
@@ -47,6 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
         height: 120,
         correctLevel: QRCode.CorrectLevel.H
     });
+
+    function parseDateAsLocal(dateString) {
+        // Expressão regular para verificar se é uma data sem hora (formato YYYY-MM-DD)
+        const dateOnlyRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+        const dateOnlyMatch = dateString.match(dateOnlyRegex);
+
+        if (dateOnlyMatch) {
+            // Se for apenas data, construímos o objeto manualmente para evitar erros de fuso.
+            const year = parseInt(dateOnlyMatch[1], 10);
+            const month = parseInt(dateOnlyMatch[2], 10) - 1; // Meses em JS são de 0 a 11
+            const day = parseInt(dateOnlyMatch[3], 10);
+            return new Date(year, month, day);
+        }
+
+        // Se for uma string de data completa (com hora e fuso), `new Date()` já funciona bem.
+        return new Date(dateString);
+    }
+
+    /**
+     * Cria um objeto Date de forma segura a partir de uma string, evitando problemas de fuso horário.
+     * Para strings 'YYYY-MM-DD', garante que a data seja criada à meia-noite no fuso horário local.
+     */
+    function parseDateAsLocal(dateString) {
+        // Expressão regular para verificar se é uma data sem hora (formato YYYY-MM-DD)
+        const dateOnlyRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+        const dateOnlyMatch = dateString.match(dateOnlyRegex);
+
+        if (dateOnlyMatch) {
+            // Se for apenas data, construímos o objeto manualmente para evitar erros de fuso.
+            const year = parseInt(dateOnlyMatch[1], 10);
+            const month = parseInt(dateOnlyMatch[2], 10) - 1; // Meses em JS são de 0 a 11
+            const day = parseInt(dateOnlyMatch[3], 10);
+            return new Date(year, month, day);
+        }
+        
+        // Se for uma string de data completa (com hora e fuso), `new Date()` já funciona bem.
+        return new Date(dateString);
+    }
 
     function connectWebSocket() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -77,15 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
         let nextEventFound = false;
 
         events.forEach(event => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
+            // Usamos nossa nova função para criar as datas de forma segura
+            const start = parseDateAsLocal(event.start);
+            const end = parseDateAsLocal(event.end);
+            
             const isAllDay = !event.start.includes('T');
 
             let finalDateTimeStr = '';
             const timeOptions = { hour: '2-digit', minute: '2-digit' };
             const dayOptions = { day: '2-digit', month: '2-digit' };
             
-            const isSameDay = start.toDateString() === end.toDateString() || (isAllDay && end.getTime() - start.getTime() <= 24 * 60 * 60 * 1000);
+            // A lógica aqui estava boa, o problema era a criação do objeto Date.
+            // Para um evento de dia inteiro, a API do Google retorna a data de fim como o dia *seguinte* à meia-noite.
+            // Ex: Evento de 1 dia em 31/07 -> start: '2024-07-31', end: '2024-08-01'.
+            // Por isso, a diferença de tempo é exatamente 24h.
+            const isSameDay = isAllDay && (end.getTime() - start.getTime() <= 24 * 60 * 60 * 1000);
 
             if (isSameDay) {
                 const datePart = start.toLocaleDateString('pt-BR', dayOptions);
@@ -93,8 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 finalDateTimeStr = `${datePart}<br><span class="time-range">${timePart}</span>`;
             } else {
                 const formatMultiDayPart = (dt) => `${dt.toLocaleDateString('pt-BR', dayOptions)}${isAllDay ? '' : ` ${dt.toLocaleTimeString('pt-BR', timeOptions)}`}`;
+                
+                // Para eventos de múltiplos dias ou com horário, a data final precisa ser ajustada.
+                // Se for dia inteiro, o fim real é o dia anterior ao que a API informa.
+                // Subtrair 1 milissegundo é uma forma segura de fazer isso.
                 const finalEnd = isAllDay ? new Date(end.getTime() - 1) : end;
-                finalDateTimeStr = `<span class="multiday-label">De  </span>${formatMultiDayPart(start)}<br><span class="multiday-label">Até</span> ${formatMultiDayPart(finalEnd)}`;
+                finalDateTimeStr = `<span class="multiday-label">De&nbsp;&nbsp;</span>${formatMultiDayPart(start)}<br><span class="multiday-label">Até</span> ${formatMultiDayPart(finalEnd)}`;
             }
 
             const eventItem = document.createElement('div');
@@ -119,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDisplay() {
         if (progressIntervalId) clearInterval(progressIntervalId);
         if (scrollAnimationId) cancelAnimationFrame(scrollAnimationId);
-        
+
         // Se não houver conteúdo, mostra a mensagem de "vazio" e para
         if (!content || content.length === 0) {
             carouselWrapper.style.display = 'none';
@@ -196,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         void progressBarFill.offsetWidth; // Força o navegador a aplicar a mudança
 
         progressBarFill.style.transition = 'width 0.1s linear';
-        
+
         let startTime = Date.now();
         progressIntervalId = setInterval(() => {
             const elapsedTime = Date.now() - startTime;
@@ -204,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBarFill.style.width = `${Math.min(progress, 100)}%`;
         }, 100);
     }
-    
+
     function startSmoothScroll() {
         const scrollHeight = descriptionArea.scrollHeight;
         const clientHeight = descriptionArea.clientHeight;
@@ -232,12 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startCarousel() {
         if (carouselIntervalId) clearInterval(carouselIntervalId);
-        updateDisplay(); 
+        updateDisplay();
         if (content && content.length > 0) {
             carouselIntervalId = setInterval(nextItem, config.carouselInterval);
         }
     }
-    
+
     function updateClock() {
         if (clockEl) {
             clockEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -270,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
     startCarousel();
     setInterval(fetchAndUpdateContent, config.contentUpdateInterval);
-    
+
     if (clockEl) {
         updateClock();
         clockIntervalId = setInterval(updateClock, 1000);

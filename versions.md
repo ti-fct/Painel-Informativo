@@ -1,5 +1,12 @@
 # Histórico de Versões
 
+## Versão 2.1.1 - (Data: 17/09/2025)
+
+*   **🔧 CORREÇÃO:** Corrigido um erro crítico no calendário que fazia com que as datas de eventos, especialmente no final do mês, fossem exibidas incorretamente (geralmente como o dia anterior), devido a problemas de fuso horário na interpretação de datas.
+*   **🚀 MELHORIA:** Aprimorada a lógica de exibição de eventos de "Dia Inteiro" e de múltiplos dias no calendário para maior precisão e robustez.
+
+---
+
 ## Versão 2.1.0 - (Data: 23/07/2025)
 
 *   **✨ NOVIDADE:** Agora é possível criar uma página de versões do sistema para que os usuários possam acompanhar as novidades e melhorias feitas.
