@@ -120,6 +120,10 @@ Na página de avisos, você pode realizar operações de CRUD (Criar, Ler, Atual
 ## Próximos Passos e Melhorias Futuras
 
 - [X] Melhorar organização e comentários do código.
+- [ ] Desenvolver e implementar um sistema/script automatizado de instalação e backup.
+- [ ] Dar um nome ao software, atualizando também todas as referências internas (documentação, código-fonte, instaladores e arquivos de configuração).
+- [ ] Validar o funcionamento completo do sistema (instalação, restauração de backup e integridade dos dados).
+- [ ] Preparar a documentação técnica e manual do usuário.
 - [ ] Melhorar Gerenciamento de Dados (race condition)
 - [ ] Permitir a configuração de múltiplas fontes de conteúdo (mais de um feed RSS) por tela.
 - [ ] Implementar estratégias de cache inteligentes com Service Worker. (Exige HTTPS)
